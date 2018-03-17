@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        android:key="module_not_enabled"
+        android:title="@string/module_not_activated_title"
+        android:summary="@string/module_not_activated_summary"
+        android:icon="@drawable/ic_error"
+        android:layout="@layout/error_preference" />
+
+    <Preference
+        android:key="preferences_not_readable"
+        android:title="@string/preferences_not_readable_title"
+        android:icon="@drawable/ic_error"
+        android:layout="@layout/error_preference" />
+
+    <!--suppress AndroidElementNotAllowed -->
+    <xyz.paphonb.androidpify.ui.SubPreference
+        android:title="@string/pref_status_bar_title"
+        android:summary="@string/pref_status_bar_summary"
+        android:icon="@drawable/ic_phone"
+        app:content="@xml/preferences_notifications"
+        android:layout="@layout/sub_preference" />
+
+    <!--suppress AndroidElementNotAllowed -->
+    <xyz.paphonb.androidpify.ui.SubPreference
+        android:title="@string/pref_settings_title"
+        android:summary="@string/pref_settings_summary"
+        android:icon="@drawable/ic_settings"
+        app:content="@xml/preferences_settings"
+        android:layout="@layout/sub_preference" />
+
+    <Preference
+        android:title="@string/about_title"
+        android:summary="@string/about_pref_summary"
+        android:icon="@drawable/ic_info"
+        android:layout="@layout/sub_preference">
+
+        <!--suppress AndroidDomInspection (Injected at compile time) -->
+        <intent
+            android:targetPackage="xyz.paphonb.androidpify"
+            android:targetClass="xyz.paphonb.androidpify.ui.AboutActivity"/>
+    </Preference>
+</PreferenceScreen>

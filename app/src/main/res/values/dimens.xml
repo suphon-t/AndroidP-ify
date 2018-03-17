@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="nav_bar_divider_size">1dp</dimen>
+    <dimen name="app_bar_elevation">4dp</dimen>
+    <dimen name="notification_side_paddings">4dp</dimen>
+    <dimen name="widget_separator_width">16dp</dimen>
+    <dimen name="widget_separator_thickness">1dp</dimen>
+    <dimen name="widget_bottom_separator_padding">29dp</dimen>
+    <dimen name="notification_corner_radius">2dp</dimen>
+    <dimen name="quick_qs_offset_height">48dp</dimen>
+    <dimen name="quick_qs_top_margin">90dp</dimen>
+    <dimen name="quick_qs_total_height">176dp</dimen>
+    <dimen name="qs_gradient_height">126dp</dimen>
+    <dimen name="qs_background_elevation">4dp</dimen>
+    <dimen name="qs_header_system_icons_area_height">48dp</dimen>
+    <dimen name="qs_status_icons_height">20dp</dimen>
+    <dimen name="qs_status_icons_margin_top">8dp</dimen>
+    <dimen name="qs_status_icons_margin_bottom">14dp</dimen>
+    <dimen name="signal_cluster_margin_start">2.5dp</dimen>
+    <dimen name="quick_qs_date_padding">4dp</dimen>
+    <dimen name="search_bar_margin">16dp</dimen>
+    <dimen name="search_bar_negative_margin">-16dp</dimen>
+    <dimen name="settings_suggestion_padding">11dp</dimen>
+    <dimen name="settings_card_radius">8dp</dimen>
+    <dimen name="search_bar_text_size">16dp</dimen>
+    <dimen name="dashboard_tile_image_size">36dp</dimen>
+    <dimen name="dashboard_tile_foreground_image_size">24dp</dimen>
+    <dimen name="dashboard_tile_foreground_image_inset">6dp</dimen>
+    <dimen name="dashboard_tile_image_margin">18dp</dimen>
+</resources>

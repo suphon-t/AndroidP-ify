@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="status_bar_view_state_tag" type="id" />
+    <item name="quick_qs_system_icons" type="id" />
+    <item name="quick_qs_status_icons" type="id" />
+    <item name="signal_cluster" type="id" />
+    <item name="quick_qs_footer_layout" type="id" />
+</resources>

@@ -1,0 +1,22 @@
+<resources>
+
+    <style name="SettingsTheme.Base" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">?android:windowBackground</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionBarTheme">@style/SettingsTheme.ActionBar</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="android:colorEdgeEffect">?colorAccent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+    <style name="SettingsTheme" parent="SettingsTheme.Base" />
+    <style name="SettingsTheme.ActionBar" parent="SettingsTheme">
+        <item name="android:textColorPrimary">?attr/colorAccent</item>
+        <item name="android:textColorSecondary">?attr/colorAccent</item>
+        <item name="android:colorControlNormal">?attr/colorAccent</item>
+    </style>
+
+    <style name="SearchBar" parent="@android:style/TextAppearance.Material.Widget.Toolbar.Subtitle">
+        <item name="android:textSize">@dimen/search_bar_text_size</item>
+    </style>
+</resources>

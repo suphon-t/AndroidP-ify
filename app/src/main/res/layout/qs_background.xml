@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <View
+        android:id="@+id/quick_settings_background"
+        android:background="@drawable/qs_background_primary"
+        android:layout_width="fill_parent"
+        android:layout_height="0.0dip"
+        android:elevation="@dimen/qs_background_elevation" />
+    <View
+        android:id="@+id/quick_settings_status_bar_background"
+        android:background="#ff000000"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/quick_qs_offset_height" />
+    <View
+        android:id="@+id/quick_settings_gradient_view"
+        android:background="@drawable/qs_bg_gradient"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/qs_gradient_height"
+        android:layout_marginTop="@dimen/quick_qs_offset_height" />
+</merge>

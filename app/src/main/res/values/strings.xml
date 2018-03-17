@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Android P-ify</string>
+    <string name="xposed_description">Use features introduced in Android P on your O+ Device!</string>
+    <string name="pref_status_bar_title">Status bar</string>
+    <string name="pref_status_bar_summary">Customize your status bar</string>
+    <string name="enable_left_clock_title">Left clock</string>
+    <string name="enable_left_clock_summary">Move status bar clock to the left</string>
+    <string name="force_dark_theme_title">Force dark theme</string>
+    <string name="force_dark_theme_summary">Always use dark theme on notification panel (for 8.1)</string>
+    <string name="module_not_activated_title">Module not activated!</string>
+    <string name="module_not_activated_summary">Please activate the module in Xposed Installer</string>
+    <string name="xposed_installer_not_found">Xposed Installer is not installed. Please install it first.</string>
+    <string name="preferences_not_readable_title">Preferences not readable!</string>
+    <string name="preferences_not_readable_summary">Pls don\'t click me</string>
+    <string name="settings_changed">Settings changed</string>
+    <string name="settings_changed_description">Restart to apply changes</string>
+    <string name="notif_channel_general_title">General</string>
+    <string name="restart_systemui">Restart SystemUI</string>
+    <string name="restart_broadcast_sent">Restart broadcast sent</string>
+    <string name="restart_android">Restart Android</string>
+    <string name="change_pull_down_title">Style notifications and quick settings</string>
+    <string name="change_pull_down_summary">Use new style from Android P</string>
+    <string name="pref_settings_title">Settings</string>
+    <string name="pref_settings_summary">Customize your settings app</string>
+    <string name="change_settings_theme_title">Style settings</string>
+    <string name="change_settings_theme_summary">Use new style from Android P</string>
+    <string name="about_title">About</string>
+    <string name="about_pref_summary">Get more info</string>
+    <string name="about_share_title">Share</string>
+    <string name="about_author_title">Author</string>
+    <string name="about_author_name">paphonb</string>
+    <string name="about_author_github">View on GitHub</string>
+    <string name="share_with">Share \"%s\" with</string>
+    <string name="share_text">Check out \"%s\"\nhttps://github.com/paphonb/AndroidP-ify</string>
+    <string name="version_text">Version %s</string>
+</resources>

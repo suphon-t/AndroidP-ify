@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/homepage_sound_background" />
+            <size android:height="@dimen/dashboard_tile_image_size" android:width="@dimen/dashboard_tile_image_size" />
+        </shape>
+    </item>
+    <item android:height="@dimen/dashboard_tile_foreground_image_size" android:width="@dimen/dashboard_tile_foreground_image_size" android:drawable="@drawable/ic_settings_sound" android:top="@dimen/dashboard_tile_foreground_image_inset" android:start="@dimen/dashboard_tile_foreground_image_inset" />
+</layer-list>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#fff5f5f5</color>
+    <color name="colorPrimaryDark">#ffe0e0e0</color>
+    <color name="colorAccent">#ff4285f4</color>
+    
+    <color name="homepage_accessibility_background">#ff5011c1</color>
+    <color name="homepage_accounts_background">#fff15b8d</color>
+    <color name="homepage_app_and_notification_background">#ffff7e0f</color>
+    <color name="homepage_battery_background">#ff258982</color>
+    <color name="homepage_connected_device_background">#ff71a234</color>
+    <color name="homepage_display_background">#ffffb600</color>
+    <color name="homepage_generic_icon_background">#ff1a73e8</color>
+    <color name="homepage_network_background">#ff2196f3</color>
+    <color name="homepage_security_background">#ff0f9d58</color>
+    <color name="homepage_sound_background">#ff01b1af</color>
+    <color name="homepage_storage_background">#ffc14ce6</color>
+    <color name="homepage_support_background">#ff26459c</color>
+    <color name="homepage_system_background">#ff757575</color>
+</resources>

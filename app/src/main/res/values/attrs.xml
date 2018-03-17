@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SubPreference">
+        <attr name="content" format="reference" />
+        <attr name="longClickContent" format="reference" />
+    </declare-styleable>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="change_pull_down"
+        android:summary="@string/change_pull_down_summary"
+        android:title="@string/change_pull_down_title"/>
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="enable_left_clock"
+        android:summary="@string/enable_left_clock_summary"
+        android:title="@string/enable_left_clock_title"/>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="force_dark_theme"
+        android:summary="@string/force_dark_theme_summary"
+        android:title="@string/force_dark_theme_title"/>
+</PreferenceScreen>
