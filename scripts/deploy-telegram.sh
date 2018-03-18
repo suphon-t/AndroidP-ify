@@ -9,6 +9,6 @@ CHANGELOG="$(./scripts/changelog.sh)
 
 curl -F chat_id="-1001259165513" -F sticker="CAADBQADKAADTBCSGmapM3AUlzaHAg" https://api.telegram.org/bot${BOT_TOKEN}/sendSticker
 curl -F chat_id="-1001259165513" -F document=@"${APK_NAME}" https://api.telegram.org/bot${BOT_TOKEN}/sendDocument
-curl -F chat_id="-1001259165513" -F text="${CHANGELOG}" -F parse_mode="HTML" https://api.telegram.org/bot${BOT_TOKEN}/sendMessage
+curl -F chat_id="-1001259165513" -F text="${CHANGELOG}" -F parse_mode="HTML" -F disable_web_page_preview="true" https://api.telegram.org/bot${BOT_TOKEN}/sendMessage
 
 echo $(./scripts/changelog.sh)
