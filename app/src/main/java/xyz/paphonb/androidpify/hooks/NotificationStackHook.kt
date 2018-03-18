@@ -270,7 +270,7 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                         }
 
                         qsContainer.findViewById<View>(context.resources.getIdentifier("quick_qs_panel", "id", MainHook.PACKAGE_SYSTEMUI)).apply {
-                            (layoutParams as RelativeLayout.LayoutParams).topMargin = ownContext
+                            (layoutParams as ViewGroup.MarginLayoutParams).topMargin = ownContext
                                     .resources.getDimensionPixelSize(R.dimen.quick_qs_top_margin)
                         }
 
@@ -468,7 +468,11 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                                     "qs_carrier_text", "id", MainHook.PACKAGE_SYSTEMUI)
                             val mEdit = XposedHelpers.getObjectField(param.thisObject, "mEdit")
                             val mMultiUserSwitch = XposedHelpers.getObjectField(param.thisObject, "mMultiUserSwitch")
-                            val mSettingsContainer = XposedHelpers.getObjectField(param.thisObject, "mSettingsContainer")
+                            val mSettingsContainer = try {
+                                XposedHelpers.getObjectField(param.thisObject, "mSettingsContainer")
+                            } catch (e: NoSuchFieldError) {
+                                XposedHelpers.getObjectField(param.thisObject, "mSettingsButton")
+                            }
                             val carrierText = footer.findViewById<View>(carrierTextId)
                             val addFloat = XposedHelpers.findMethodExact(classTouchAnimatorBuilder, "addFloat",
                                     Object::class.java, String::class.java, FloatArray::class.java)
