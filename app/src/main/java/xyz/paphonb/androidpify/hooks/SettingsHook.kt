@@ -20,16 +20,15 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.Icon
+import android.graphics.drawable.LayerDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import de.robv.android.xposed.IXposedHookInitPackageResources
-import de.robv.android.xposed.IXposedHookLoadPackage
-import de.robv.android.xposed.XC_MethodHook
-import de.robv.android.xposed.XposedHelpers
+import de.robv.android.xposed.*
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
 import de.robv.android.xposed.callbacks.XC_LayoutInflated
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -52,7 +51,8 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
         put("com.android.settings:drawable/ic_settings_security", R.drawable.ic_homepage_security)
         put("com.android.settings:drawable/ic_settings_accounts", R.drawable.ic_homepage_accounts)
         put("com.android.settings:drawable/ic_settings_accessibility", R.drawable.ic_homepage_accessibility)
-        put("com.google.android.gms:drawable/googleg_light_color_24", R.drawable.ic_homepage_google)
+//        put("com.google.android.gms:drawable/googleg_light_color_24", R.drawable.ic_homepage_google)
+//        put("com.google.android.gms:drawable/googleg_light_color_24", R.drawable.ic_homepage_generic)
         put("com.android.settings:drawable/ic_settings_about", R.drawable.ic_homepage_about)
     } }
 
@@ -67,24 +67,53 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                 val icon = param.thisObject as Icon
                 val context = param.args[0] as Context
 
-                val mType = XposedHelpers.getIntField(icon, "mType")
-                if (mType == 2) {
-                    val resPackage = XposedHelpers.callMethod(icon, "getResPackage") as String
-                    val resId = XposedHelpers.callMethod(icon, "getResId") as Int
+                if (shouldChangeIcon()) {
+                    val ownResource = ResourceUtils.createOwnContext(context).resources
+                    val mType = XposedHelpers.getIntField(icon, "mType")
+                    if (mType == 2) {
+                        val resPackage = XposedHelpers.callMethod(icon, "getResPackage") as String
+                        val resId = XposedHelpers.callMethod(icon, "getResId") as Int
 
-                    val ai = context.packageManager.getApplicationInfo(
-                            resPackage, PackageManager.MATCH_UNINSTALLED_PACKAGES)
-                    if (ai != null) {
-                        val resources = context.packageManager.getResourcesForApplication(ai)
-                        val replacement = iconMap[resources.getResourceName(resId)]
-                        if (replacement != null) {
-                            param.result = ResourceUtils.createOwnContext(context)
-                                    .resources.getDrawable(replacement, context.theme)
+                        val ai = context.packageManager.getApplicationInfo(
+                                resPackage, PackageManager.MATCH_UNINSTALLED_PACKAGES)
+                        if (ai != null) {
+                            val resources = context.packageManager.getResourcesForApplication(ai)
+                            val replacement = iconMap[resources.getResourceName(resId)]
+                            if (replacement != null) {
+                                param.result = ownResource.getDrawable(replacement, context.theme)
+                                return
+                            }
                         }
                     }
+                    val background = ownResource.getDrawable(R.drawable.ic_homepage_generic, context.theme)
+                    val drawable = XposedBridge.invokeOriginalMethod(
+                            param.method, param.thisObject, arrayOf(context)) as Drawable
+                    val size = ownResource.getDimensionPixelSize(R.dimen.dashboard_tile_foreground_image_size)
+                    val inset = ownResource.getDimensionPixelSize(R.dimen.dashboard_tile_foreground_image_inset)
+                    drawable.setBounds(0, 0, size, size)
+                    drawable.setTint(Color.WHITE)
+                    val layerDrawable = LayerDrawable(arrayOf(background, drawable))
+                    val layerState = XposedHelpers.getObjectField(layerDrawable, "mLayerState")
+                    val children = XposedHelpers.getObjectField(layerState, "mChildren") as Array<*>
+                    children[1].let { child ->
+                        XposedHelpers.setIntField(child, "mInsetL", inset)
+                        XposedHelpers.setIntField(child, "mInsetT", inset)
+                        XposedHelpers.setIntField(child, "mWidth", size)
+                        XposedHelpers.setIntField(child, "mHeight", size)
+                    }
+                    param.result = layerDrawable
                 }
             }
         })
+    }
+
+    fun shouldChangeIcon(): Boolean {
+        Throwable().stackTrace.forEach { element ->
+            if (element.className.startsWith("android.s")) return false
+            if (element.className.endsWith("DashboardAdapter")) return true
+            if (element.className.endsWith("SuggestionAdapter")) return false
+        }
+        return false
     }
 
     override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
@@ -159,6 +188,8 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                         }
                     }
                 })
+
+        resparam.res.setReplacement(MainHook.PACKAGE_SETTINGS, "bool", "config_tintSettingIcon", false)
     }
 
     fun setBackgroundColor(layout: ViewGroup) {

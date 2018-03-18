@@ -31,3 +31,7 @@ fun Context.getColorAttr(attr: Int): Int {
 fun Any.logI(msg: String) {
     MainHook.logI(javaClass.simpleName, msg)
 }
+
+fun Any.logE(msg: String, throwable: Throwable? = null) {
+    MainHook.logE(javaClass.simpleName, msg, throwable)
+}
