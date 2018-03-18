@@ -6,13 +6,29 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 27
+
+    signingConfigs {
+        travis {
+            storeFile file("../pify.jks")
+            storePassword System.getenv("STORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
+    }
+
     defaultConfig {
         applicationId "xyz.paphonb.androidpify"
         minSdkVersion 26
         targetSdkVersion 27
-        versionCode 1
-        versionName "0.1.0 alpha"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        if (System.getenv("TRAVIS") == "true") {
+            versionCode = Integer.valueOf(System.getenv("TRAVIS_BUILD_NUMBER"))
+            versionName = System.getenv("MAJOR_MINOR") + " alpha #" + System.getenv("TRAVIS_BUILD_NUMBER")
+        } else {
+            versionCode 1
+            versionName "0.1.0 alpha"
+        }
     }
     buildTypes {
         release {
