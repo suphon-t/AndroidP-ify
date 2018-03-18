@@ -45,6 +45,7 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
         LeftClockHook.handleLoadPackage(lpparam)
         CustomizationsHook.handleLoadPackage(lpparam)
         NotificationStackHook.handleLoadPackage(lpparam)
+        QuickSettingsHook.handleLoadPackage(lpparam)
         SettingsHook.handleLoadPackage(lpparam)
 
         if (lpparam.packageName == PACKAGE_OWN) {
@@ -59,6 +60,7 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
     override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
         modResInternal = XModuleResources.createInstance(MODULE_PATH, resparam.res)
         NotificationStackHook.handleInitPackageResources(resparam)
+        QuickSettingsHook.handleInitPackageResources(resparam)
         SettingsHook.handleInitPackageResources(resparam)
     }
 
