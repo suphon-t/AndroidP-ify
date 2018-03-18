@@ -40,7 +40,7 @@ cache:
 before_deploy:
   - git config --local user.name "paphonb"
   - git config --local user.email "paphonb@gmail.com"
-  - git tag "Travis_${MAJOR_MINOR}_${TRAVIS_BUILD_NUMBER}"
+  - git tag "${MAJOR_MINOR}_${TRAVIS_BUILD_NUMBER}" --force
   - cp app/build/outputs/apk/release/app-release.apk $APK_NAME
 deploy:
 - provider: script
