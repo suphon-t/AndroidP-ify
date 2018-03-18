@@ -17,6 +17,7 @@
 package xyz.paphonb.androidpify
 
 import android.content.res.XModuleResources
+import android.os.Build
 import de.robv.android.xposed.*
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -60,6 +61,8 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
         NotificationStackHook.handleInitPackageResources(resparam)
         SettingsHook.handleInitPackageResources(resparam)
     }
+
+    val ATLEAST_O_MR1 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1
 
     const val PACKAGE_ANDROID = "android"
     const val PACKAGE_SYSTEMUI = "com.android.systemui"

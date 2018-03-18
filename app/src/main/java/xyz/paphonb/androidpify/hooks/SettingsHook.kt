@@ -51,8 +51,6 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
         put("com.android.settings:drawable/ic_settings_security", R.drawable.ic_homepage_security)
         put("com.android.settings:drawable/ic_settings_accounts", R.drawable.ic_homepage_accounts)
         put("com.android.settings:drawable/ic_settings_accessibility", R.drawable.ic_homepage_accessibility)
-//        put("com.google.android.gms:drawable/googleg_light_color_24", R.drawable.ic_homepage_google)
-//        put("com.google.android.gms:drawable/googleg_light_color_24", R.drawable.ic_homepage_generic)
         put("com.android.settings:drawable/ic_settings_about", R.drawable.ic_homepage_about)
     } }
 
@@ -121,50 +119,62 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
 
         if (!ConfigUtils.settings.changeSettingsTheme) return
 
-        val searchBarLayoutHook = object : XC_LayoutInflated() {
-            override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
-                val layout = liparam.view as ViewGroup
-                val context = layout.context
-                val searchBarId = context.resources.getIdentifier(
-                        "search_bar", "id", MainHook.PACKAGE_SETTINGS)
-                val searchBarHeightId = context.resources.getIdentifier(
-                        "search_bar_height", "dimen", MainHook.PACKAGE_SETTINGS)
-                val searchBarHeight = context.resources.getDimensionPixelSize(searchBarHeightId)
-                XposedHelpers.callMethod(layout.findViewById(searchBarId),
-                        "setRadius", searchBarHeight / 2)
+        if (MainHook.ATLEAST_O_MR1) {
+            val searchBarLayoutHook = object : XC_LayoutInflated() {
+                override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
+                    val layout = liparam.view as ViewGroup
+                    val context = layout.context
+                    val searchBarId = context.resources.getIdentifier(
+                            "search_bar", "id", MainHook.PACKAGE_SETTINGS)
+                    val searchBarHeightId = context.resources.getIdentifier(
+                            "search_bar_height", "dimen", MainHook.PACKAGE_SETTINGS)
+                    val searchBarHeight = context.resources.getDimensionPixelSize(searchBarHeightId)
+                    XposedHelpers.callMethod(layout.findViewById(searchBarId),
+                            "setRadius", searchBarHeight / 2)
 
-                setBackgroundColor(layout)
+                    setBackgroundColor(layout)
 
-                val searchActionBarId = context.resources.getIdentifier(
-                        "search_action_bar", "id", MainHook.PACKAGE_SETTINGS)
-                val searchActionBar = layout.findViewById<ViewGroup>(searchActionBarId) ?: return
-                LayoutInflater.from(ResourceUtils.createOwnContext(context)).inflate(
-                        R.layout.search_bar_text, searchActionBar, true)
-                val title = XposedHelpers.callMethod(searchActionBar, "getTitle") as CharSequence
-                searchActionBar.findViewById<TextView>(R.id.search_action_bar_title).text = title
-                XposedHelpers.callMethod(searchActionBar, "setTitle", "" as CharSequence)
+                    val searchActionBarId = context.resources.getIdentifier(
+                            "search_action_bar", "id", MainHook.PACKAGE_SETTINGS)
+                    val searchActionBar = layout.findViewById<ViewGroup>(searchActionBarId)
+                            ?: return
+                    LayoutInflater.from(ResourceUtils.createOwnContext(context)).inflate(
+                            R.layout.search_bar_text, searchActionBar, true)
+                    val title = XposedHelpers.callMethod(searchActionBar, "getTitle") as CharSequence
+                    searchActionBar.findViewById<TextView>(R.id.search_action_bar_title).text = title
+                    XposedHelpers.callMethod(searchActionBar, "setTitle", "" as CharSequence)
+                }
             }
-        }
-        resparam.res.hookLayout(MainHook.PACKAGE_SETTINGS, "layout", "settings_main_dashboard", searchBarLayoutHook)
-        resparam.res.hookLayout(MainHook.PACKAGE_SETTINGS, "layout", "search_panel", searchBarLayoutHook)
-        resparam.res.setReplacement(MainHook.PACKAGE_SETTINGS, "dimen", "search_bar_margin",
-                MainHook.modRes.fwd(R.dimen.search_bar_margin))
-        resparam.res.setReplacement(MainHook.PACKAGE_SETTINGS, "dimen", "search_bar_negative_margin",
-                MainHook.modRes.fwd(R.dimen.search_bar_negative_margin))
+            resparam.res.hookLayout(MainHook.PACKAGE_SETTINGS, "layout", "settings_main_dashboard", searchBarLayoutHook)
+            resparam.res.hookLayout(MainHook.PACKAGE_SETTINGS, "layout", "search_panel", searchBarLayoutHook)
+            resparam.res.setReplacement(MainHook.PACKAGE_SETTINGS, "dimen", "search_bar_margin",
+                    MainHook.modRes.fwd(R.dimen.search_bar_margin))
+            resparam.res.setReplacement(MainHook.PACKAGE_SETTINGS, "dimen", "search_bar_negative_margin",
+                    MainHook.modRes.fwd(R.dimen.search_bar_negative_margin))
 
-        resparam.res.hookLayout(MainHook.PACKAGE_SETTINGS, "layout", "suggestion_condition_container",
-                object : XC_LayoutInflated() {
-                    override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
-                        val context = liparam.view.context
-                        val ownResources = ResourceUtils.createOwnContext(context).resources
-                        val padding = ownResources.getDimensionPixelSize(R.dimen.settings_suggestion_padding)
-                        val radius = ownResources.getDimensionPixelSize(R.dimen.settings_card_radius)
-                        liparam.view.setPadding(padding, liparam.view.paddingTop,
-                                padding, liparam.view.paddingBottom)
-                        val card = (liparam.view as ViewGroup).getChildAt(0)
-                        XposedHelpers.callMethod(card, "setRadius", radius.toFloat())
-                    }
-                })
+            resparam.res.hookLayout(MainHook.PACKAGE_SETTINGS, "layout", "suggestion_condition_container",
+                    object : XC_LayoutInflated() {
+                        override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
+                            val context = liparam.view.context
+                            val ownResources = ResourceUtils.createOwnContext(context).resources
+                            val padding = ownResources.getDimensionPixelSize(R.dimen.settings_suggestion_padding)
+                            val radius = ownResources.getDimensionPixelSize(R.dimen.settings_card_radius)
+                            liparam.view.setPadding(padding, liparam.view.paddingTop,
+                                    padding, liparam.view.paddingBottom)
+                            val card = (liparam.view as ViewGroup).getChildAt(0)
+                            XposedHelpers.callMethod(card, "setRadius", radius.toFloat())
+                        }
+                    })
+
+            resparam.res.setReplacement(MainHook.PACKAGE_SETTINGS, "bool", "config_tintSettingIcon", false)
+        } else {
+            resparam.res.hookLayout(MainHook.PACKAGE_SETTINGS, "layout", "settings_main_dashboard",
+                    object : XC_LayoutInflated() {
+                        override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
+                            setBackgroundColor(liparam.view as ViewGroup)
+                        }
+                    })
+        }
 
         resparam.res.hookLayout(MainHook.PACKAGE_SETTINGS, "layout", "settings_main_prefs",
                 object : XC_LayoutInflated() {
@@ -188,8 +198,6 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                         }
                     }
                 })
-
-        resparam.res.setReplacement(MainHook.PACKAGE_SETTINGS, "bool", "config_tintSettingIcon", false)
     }
 
     fun setBackgroundColor(layout: ViewGroup) {

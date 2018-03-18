@@ -44,6 +44,7 @@ import xyz.paphonb.androidpify.aosp.StatusIconContainer
 import xyz.paphonb.androidpify.utils.ConfigUtils
 import xyz.paphonb.androidpify.utils.ResourceUtils
 import xyz.paphonb.androidpify.utils.getColorAttr
+import xyz.paphonb.androidpify.utils.logE
 import java.lang.ref.WeakReference
 
 @SuppressLint("StaticFieldLeak")
@@ -89,8 +90,10 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
 
     private val classQSContainerImpl by lazy { XposedHelpers.findClass("com.android.systemui.qs.QSContainerImpl", classLoader) }
     private val classQuickStatusBarHeader by lazy { XposedHelpers.findClass("com.android.systemui.qs.QuickStatusBarHeader", classLoader) }
+    private val classQSFooter by lazy { XposedHelpers.findClass("com.android.systemui.qs.QSFooter", classLoader) }
     private val classQSFooterImpl by lazy { XposedHelpers.findClass("com.android.systemui.qs.QSFooterImpl", classLoader) }
     private val classTouchAnimatorBuilder by lazy { XposedHelpers.findClass("com.android.systemui.qs.TouchAnimator\$Builder", classLoader) }
+    private val classDarkIconManager by lazy { XposedHelpers.findClass("com.android.systemui.statusbar.phone.StatusBarIconController\$DarkIconManager", classLoader) }
     private val classTintedIconManager by lazy { XposedHelpers.findClass("com.android.systemui.statusbar.phone.StatusBarIconController\$TintedIconManager", classLoader) }
     private val classStatusBarIconController by lazy { XposedHelpers.findClass("com.android.systemui.statusbar.phone.StatusBarIconController", classLoader) }
     private val classDependency by lazy { XposedHelpers.findClass("com.android.systemui.Dependency", classLoader) }
@@ -214,6 +217,11 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                         val ownContext = ResourceUtils.createOwnContext(context)
                         val qsElevation = ownContext.resources.getDimensionPixelSize(R.dimen.qs_background_elevation).toFloat()
 
+                        if (!MainHook.ATLEAST_O_MR1) {
+                            qsContainer.removeViewAt(0)
+                            XposedHelpers.setIntField(qsContainer, "mGutterHeight", 0)
+                        }
+
                         qsContainer.background = null
 
                         qsContainer.addView(View(context).apply {
@@ -312,6 +320,12 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                                 top = (XposedHelpers.getObjectField(param.thisObject, "mQSPanel") as View).top
                                 bottom = height
                             }
+                            if (!MainHook.ATLEAST_O_MR1) {
+                                val elevation = findViewById<View>(R.id.quick_settings_background).elevation
+                                (XposedHelpers.getObjectField(param.thisObject, "mQSDetail") as View).elevation = elevation
+                                (XposedHelpers.getObjectField(param.thisObject, "mQSFooter") as View).elevation = elevation
+                                (XposedHelpers.getObjectField(param.thisObject, "mQSPanel") as View).elevation = elevation
+                            }
                         }
                     }
                 })
@@ -341,6 +355,11 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                         val background = 0x4DFFFFFF
                         XposedHelpers.callMethod(XposedHelpers.getObjectField(battery, "mDrawable"), "setColors", foreground, background)
                         XposedHelpers.callMethod(battery, "setTextColor", foreground)
+
+                        if (!MainHook.ATLEAST_O_MR1) {
+                            systemIcons.layoutParams.height = MainHook.modRes
+                                    .getDimensionPixelSize(R.dimen.qs_header_system_icons_area_height)
+                        }
 
                         // Move clock to left side
                         val clock = systemIcons.findViewById<View>(context.resources.getIdentifier(
@@ -390,10 +409,17 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                                 Int::class.java, Rect::class.java, Float::class.java, Int::class.java)
                         applyDarkness.invoke(header, R.id.signal_cluster, Rect(), intensity, fillColor)
 
-                        val constructor = XposedHelpers.findConstructorExact(classTintedIconManager,
-                                ViewGroup::class.java)
-                        val iconManager = constructor.newInstance(statusIcons)
-                        XposedHelpers.callMethod(iconManager, "setTint", fillColor)
+                        val iconManager = if (MainHook.ATLEAST_O_MR1) {
+                            val constructor = XposedHelpers.findConstructorExact(
+                                    classTintedIconManager, ViewGroup::class.java)
+                            constructor.newInstance(statusIcons).apply {
+                                XposedHelpers.callMethod(this, "setTint", fillColor)
+                            }
+                        } else {
+                            val constructor = XposedHelpers.findConstructorExact(
+                                    classDarkIconManager, LinearLayout::class.java)
+                            constructor.newInstance(statusIcons)
+                        }
                         XposedHelpers.setAdditionalInstanceField(header, "mIconManager",
                                 iconManager)
 
@@ -432,8 +458,9 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                 if (!classQuickStatusBarHeader.isInstance(param.thisObject)) return
 
                 val iconController = XposedHelpers.callStaticMethod(classDependency, "get", classStatusBarIconController)
-                XposedHelpers.callMethod(iconController, "addIconGroup",
-                        XposedHelpers.getAdditionalInstanceField(param.thisObject, "mIconManager"))
+                XposedHelpers.getAdditionalInstanceField(param.thisObject, "mIconManager")?.let {
+                    XposedHelpers.callMethod(iconController, "addIconGroup", it)
+                } ?: logE("onAttachedToWindow: mIconManager = null")
             }
         })
 
@@ -442,8 +469,9 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                 if (!classQuickStatusBarHeader.isInstance(param.thisObject)) return
 
                 val iconController = XposedHelpers.callStaticMethod(classDependency, "get", classStatusBarIconController)
-                XposedHelpers.callMethod(iconController, "removeIconGroup",
-                        XposedHelpers.getAdditionalInstanceField(param.thisObject, "mIconManager"))
+                XposedHelpers.getAdditionalInstanceField(param.thisObject, "mIconManager")?.let {
+                    XposedHelpers.callMethod(iconController, "removeIconGroup", it)
+                } ?: logE("onAttachedToWindow: mIconManager = null")
             }
         })
 
@@ -457,7 +485,9 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
             }
         })
 
-        findAndHookMethod(classQSFooterImpl, "createSettingsAlphaAnimator",
+        val footerClass = if (MainHook.ATLEAST_O_MR1) classQSFooterImpl else classQSFooter
+
+        findAndHookMethod(footerClass, "createSettingsAlphaAnimator",
                 object : XC_MethodHook() {
                     override fun beforeHookedMethod(param: MethodHookParam) {
                         classTouchAnimatorBuilder.newInstance().apply {
@@ -494,10 +524,10 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                 XposedHelpers.setBooleanField(param.thisObject, "mAlarmShowing", false)
             }
         }
-        findAndHookMethod(classQSFooterImpl, "updateAnimator", Int::class.java, clearAlarmShowing)
-        findAndHookMethod(classQSFooterImpl, "updateAlarmVisibilities", clearAlarmShowing)
+        findAndHookMethod(footerClass, "updateAnimator", Int::class.java, clearAlarmShowing)
+        findAndHookMethod(footerClass, "updateAlarmVisibilities", clearAlarmShowing)
 
-        findAndHookMethod(classQSFooterImpl, "onFinishInflate",
+        findAndHookMethod(footerClass, "onFinishInflate",
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val footer = param.thisObject as ViewGroup
@@ -693,8 +723,13 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
         if (resparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
         if (!ConfigUtils.notifications.changePullDown) return
 
-        resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "qs_header_system_icons_area_height",
-                MainHook.modRes.fwd(R.dimen.qs_header_system_icons_area_height))
+        if (MainHook.ATLEAST_O_MR1) {
+            resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "qs_header_system_icons_area_height",
+                    MainHook.modRes.fwd(R.dimen.qs_header_system_icons_area_height))
+        } else {
+            resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "qs_gutter_height",
+                    MainHook.modRes.fwd(R.dimen.zero))
+        }
         resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "status_bar_header_height",
                 MainHook.modRes.fwd(R.dimen.quick_qs_total_height))
     }
