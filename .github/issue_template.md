@@ -1,0 +1,54 @@
+<!--
+You need to fill all informations below or the issue will likely be instantly closed and ignored.
+-->
+
+**Description**
+<!--
+Describe your issue as clear as possible.
+-->
+
+**Steps to reproduce**
+<!--
+Describe how you got the issue.
+Example: 1. Pull down QS panel
+         2. Toggle stuffs on/off
+         3. SystemUI crashes
+-->
+
+**ROM info**
+<!--
+Include basic information about your device here. 
+Example: AOSP 8.1 on Xperia XZ (F8332)
+         LineageOS 15.1 on Xperia XZ (F8332)
+         A random ROM on a random device (device model name)
+-->
+
+**Module version (build version)**
+<!--
+Include your module info her.
+Example: Android P-ify version 0.1.0 alpha
+         Android P-ify snapshot 0.1.0 alpha #13
+-->
+
+**Xposed log / logcat**
+<!--
+Put your Xpsoed log or logcat here. If they are too long you can upload it somewhere else such as Google Drive and put a PUBLICLY ACCESSIBLE link here.
+
+When to use Xposed log and when to use logcat?
+Logcat if you got crashes, xposed log if not.
+-->
+
+<!--
+Hey there! You found a problem with the module and found your way here to report it? Great! But there are some things you have to keep in mind before submitting a new issue:
+
+First, CHECK FOR DUPLICATES. Use the search function to search for keywords matching your issue. If there already is one which sounds similar to your one, please reply there instead of opening a new issue. Only exception are SystemUI crashes as they can be caused by various reasons. If any contributor finds a duplicate (or the same crash) he will close it.
+
+Second, ALWAYS ATTACH YOUR XPOSED LOG. If an app crashes though you'll have to add a logcat. Use Google to learn how to capture a logcat.
+
+Third, if you are using a stable version from the Xposed repository, INSTALL A SNAPSHOT BUILD to see if the issue is already fixed. You can find these snapshot in the readme.
+
+If the issue is new and not yet fixed in the snapshot builds go ahead and DESCRIBE YOUR ISSUE AS PRECISE AS POSSIBLE, add screenshots or videos if necessary.
+
+Note that there is no time limit in which the issue will be adressed. Some get fixed quickly, others take some time. Don't open a new issue because you think we forgot about the old one - we don't "forget" issues.
+Now that you've read all of this (and hopefully followed the instructions... ಠ_ಠ) you can add the description and logs. Do with this text what you want, it won't appear in the issue anyways.
+-->
