@@ -1,4 +1,4 @@
-# Android P-ify
+# Android P-ify ![Build status](https://travis-ci.org/paphonb/AndroidP-ify.svg?branch=master)
 An Xposed module which allows you to use features introduced in Android P on devices running Oreo!
 
 

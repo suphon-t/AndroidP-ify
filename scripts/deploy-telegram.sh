@@ -1,9 +1,5 @@
 #!/usr/bin/env sh
 
-APK_NAME=AndroidPify-${MAJOR_MINOR}_${TRAVIS_BUILD_NUMBER}.apk
-
-cp app/build/outputs/apk/release/app-release.apk ${APK_NAME}
-
 CHANGELOG="$(./scripts/changelog.sh)
 <a href=\"https://github.com/${TRAVIS_REPO_SLUG}/compare/${TRAVIS_COMMIT_RANGE}\">View on GitHub</a>"
 
