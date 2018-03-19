@@ -167,6 +167,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         val footerLeft = footerLayout.getChildAt(0) as ViewGroup
                         footerLeft.removeAllViews()
                         footerLeft.addView(carrierText)
+                        footerLeft.background = null
+                        footerLeft.setOnClickListener(null)
 
                         qsContainer.findViewById<ViewGroup>(R.id.quick_qs_system_icons)
                                 .addView(date, 1)
