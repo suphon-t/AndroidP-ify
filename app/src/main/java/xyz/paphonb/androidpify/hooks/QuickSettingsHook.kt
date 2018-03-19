@@ -501,6 +501,16 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     }
                 })
 
+        findAndHookMethod(classQSAnimator, "clearAnimationState",
+                object : XC_MethodHook() {
+                    @Suppress("UNCHECKED_CAST")
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        val topFiveQs = XposedHelpers.getObjectField(
+                                param.thisObject, "mTopFiveQs") as ArrayList<View>
+                        topFiveQs.forEach { (it.parent as View).visibility = View.VISIBLE }
+                    }
+                })
+
         findAndHookMethod(classQSPanel, "addDivider",
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
