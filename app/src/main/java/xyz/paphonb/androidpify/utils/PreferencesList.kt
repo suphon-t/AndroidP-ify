@@ -23,6 +23,8 @@ object PreferencesList {
             put(enableLeftClock, LEVEL_SYSTEM_UI)
             put(forceDarkTheme, LEVEL_SYSTEM_UI)
             put(changePullDown, LEVEL_SYSTEM_UI)
+            put(circleTileBackground, LEVEL_SYSTEM_UI)
+            put(qsVerticalScroll, LEVEL_SYSTEM_UI)
             put(statusBarHeight, LEVEL_ANDROID)
         }
     }
@@ -30,6 +32,8 @@ object PreferencesList {
     const val enableLeftClock = "enable_left_clock"
     const val forceDarkTheme = "force_dark_theme"
     const val changePullDown = "change_pull_down"
+    const val circleTileBackground = "circle_tile_background"
+    const val qsVerticalScroll = "qs_vertical_scroll"
     const val statusBarHeight = "status_bar_height"
 
     const val changeSettingsTheme = "change_settings_theme"

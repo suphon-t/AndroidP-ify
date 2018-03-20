@@ -3,27 +3,29 @@ package xyz.paphonb.androidpify.hooks
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.AttributeSet
+import android.view.*
+import android.view.View.MeasureSpec
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.*
-import de.robv.android.xposed.IXposedHookInitPackageResources
-import de.robv.android.xposed.IXposedHookLoadPackage
-import de.robv.android.xposed.XC_MethodHook
-import de.robv.android.xposed.XposedHelpers
+import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.findAndHookConstructor
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import xyz.paphonb.androidpify.MainHook
 import xyz.paphonb.androidpify.R
+import xyz.paphonb.androidpify.aosp.QSScrollLayout
 import xyz.paphonb.androidpify.aosp.StatusIconContainer
 import xyz.paphonb.androidpify.utils.*
+
+
 
 
 /*
@@ -63,6 +65,11 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classQSTileImpl by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl", classLoader) }
     private val classQSAnimator by lazy { XposedHelpers.findClass("com.android.systemui.qs.QSAnimator", classLoader) }
     private val classQSPanel by lazy { XposedHelpers.findClass("com.android.systemui.qs.QSPanel", classLoader) }
+    private val classQuickQSPanel by lazy { XposedHelpers.findClass("com.android.systemui.qs.QuickQSPanel", classLoader) }
+    private val classQS by lazy { XposedHelpers.findClass("com.android.systemui.plugins.qs.QS", classLoader) }
+    private val classTileLayout by lazy { XposedHelpers.findClass("com.android.systemui.qs.TileLayout", classLoader) }
+    private val classPageListener by lazy { XposedHelpers.findClass("com.android.systemui.qs.PagedTileLayout\$PageListener", classLoader) }
+    private val classNotificationPanelView by lazy { XposedHelpers.findClass("com.android.systemui.statusbar.phone.NotificationPanelView", classLoader) }
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
@@ -419,110 +426,262 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     }
                 })
 
-        findAndHookConstructor(classQSTileBaseView, Context::class.java,
-                classQSIconView, Boolean::class.java, object : XC_MethodHook() {
-            override fun afterHookedMethod(param: MethodHookParam) {
-                val iconFrame = XposedHelpers.getObjectField(param.thisObject, "mIconFrame") as ViewGroup
-                val context = iconFrame.context
+        if (ConfigUtils.notifications.circleTileBackground) {
+            findAndHookConstructor(classQSTileBaseView, Context::class.java,
+                    classQSIconView, Boolean::class.java, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val iconFrame = XposedHelpers.getObjectField(param.thisObject, "mIconFrame") as ViewGroup
+                    val context = iconFrame.context
 
-                ImageView(context).apply {
-                    id = R.id.qs_tile_background
-                    scaleType = ImageView.ScaleType.FIT_CENTER
-                    setImageDrawable(MainHook.modRes.getDrawable(R.drawable.ic_qs_circle))
-                    iconFrame.addView(this, 0)
+                    ImageView(context).apply {
+                        id = R.id.qs_tile_background
+                        scaleType = ImageView.ScaleType.FIT_CENTER
+                        setImageDrawable(MainHook.modRes.getDrawable(R.drawable.ic_qs_circle))
+                        iconFrame.addView(this, 0)
+                    }
+
+                    XposedHelpers.setAdditionalInstanceField(param.thisObject, "mCircleColor", 0)
+                    XposedHelpers.setAdditionalInstanceField(param.thisObject, "mColorActive",
+                            context.getColorAccent())
+                    XposedHelpers.setAdditionalInstanceField(param.thisObject, "mColorDisabled",
+                            context.getDisabled(context.getColorAttr(android.R.attr.textColorTertiary)))
                 }
+            })
 
-                XposedHelpers.setAdditionalInstanceField(param.thisObject, "mCircleColor", 0)
-                XposedHelpers.setAdditionalInstanceField(param.thisObject, "mColorActive",
-                        context.getColorAccent())
-                XposedHelpers.setAdditionalInstanceField(param.thisObject, "mColorDisabled",
-                        context.getDisabled(context.getColorAttr(android.R.attr.textColorTertiary)))
-            }
-        })
+            findAndHookMethod(classQSTileBaseView, "handleStateChanged",
+                    classQSTileState, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    val tileBaseView = param.thisObject as ViewGroup
+                    val bg = tileBaseView.findViewById<ImageView>(R.id.qs_tile_background)
 
-        findAndHookMethod(classQSTileBaseView, "handleStateChanged",
-                classQSTileState, object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
-                val tileBaseView = param.thisObject as ViewGroup
-                val bg = tileBaseView.findViewById<ImageView>(R.id.qs_tile_background)
-
-                val circleColor = getCircleColor(tileBaseView,
-                        XposedHelpers.getIntField(param.args[0], "state"))
-                val mCircleColor = XposedHelpers.getAdditionalInstanceField(tileBaseView, "mCircleColor") as Int
-                if (circleColor != mCircleColor) {
-                    if (bg.isShown) {
-                        val animator = ValueAnimator.ofArgb(mCircleColor, circleColor).apply { duration = 350 }
-                        animator.addUpdateListener { bg.imageTintList = ColorStateList.valueOf((it.animatedValue as Int)) }
-                        animator.start()
-                    } else {
-                        bg.imageTintList = ColorStateList.valueOf(circleColor)
+                    val circleColor = getCircleColor(tileBaseView,
+                            XposedHelpers.getIntField(param.args[0], "state"))
+                    val mCircleColor = XposedHelpers.getAdditionalInstanceField(tileBaseView, "mCircleColor") as Int
+                    if (circleColor != mCircleColor) {
+                        if (bg.isShown) {
+                            val animator = ValueAnimator.ofArgb(mCircleColor, circleColor).apply { duration = 350 }
+                            animator.addUpdateListener { bg.imageTintList = ColorStateList.valueOf((it.animatedValue as Int)) }
+                            animator.start()
+                        } else {
+                            bg.imageTintList = ColorStateList.valueOf(circleColor)
+                        }
+                        XposedHelpers.setAdditionalInstanceField(tileBaseView, "mCircleColor", circleColor)
                     }
-                    XposedHelpers.setAdditionalInstanceField(tileBaseView, "mCircleColor", circleColor)
                 }
-            }
-        })
+            })
 
-        findAndHookMethod(classSlashImageView, "setState",
-                classSlashState, Drawable::class.java, object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
-                param.args[0] = null
-            }
-        })
-
-        findAndHookMethod(classQSTileImpl, "getColorForState",
-                Context::class.java, Int::class.java, object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
-                val state = param.args[1] as Int
-
-                if (state == 2) {
-                    param.result = Color.WHITE
+            findAndHookMethod(classSlashImageView, "setState",
+                    classSlashState, Drawable::class.java, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    param.args[0] = null
                 }
-            }
-        })
+            })
 
-        findAndHookMethod(classQSAnimator, "onAnimationAtEnd",
-                object : XC_MethodHook() {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun afterHookedMethod(param: MethodHookParam) {
-                        val topFiveQs = XposedHelpers.getObjectField(
-                                param.thisObject, "mTopFiveQs") as ArrayList<View>
-                        topFiveQs.forEach { (it.parent as View).visibility = View.VISIBLE }
+            findAndHookMethod(classQSTileImpl, "getColorForState",
+                    Context::class.java, Int::class.java, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    val state = param.args[1] as Int
+
+                    if (state == 2) {
+                        param.result = Color.WHITE
                     }
-                })
+                }
+            })
 
-        findAndHookMethod(classQSAnimator, "onAnimationStarted",
-                object : XC_MethodHook() {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun afterHookedMethod(param: MethodHookParam) {
-                        if (!XposedHelpers.getBooleanField(param.thisObject, "mOnFirstPage"))
-                            return
+            findAndHookMethod(classQSAnimator, "onAnimationAtEnd",
+                    object : XC_MethodHook() {
+                        @Suppress("UNCHECKED_CAST")
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val topFiveQs = XposedHelpers.getObjectField(
+                                    param.thisObject, "mTopFiveQs") as ArrayList<View>
+                            topFiveQs.forEach { (it.parent as View).visibility = View.VISIBLE }
+                        }
+                    })
 
-                        val topFiveQs = XposedHelpers.getObjectField(
-                                param.thisObject, "mTopFiveQs") as ArrayList<View>
-                        topFiveQs.forEach { (it.parent as View).visibility = View.INVISIBLE }
+            findAndHookMethod(classQSAnimator, "onAnimationStarted",
+                    object : XC_MethodHook() {
+                        @Suppress("UNCHECKED_CAST")
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            if (!XposedHelpers.getBooleanField(param.thisObject, "mOnFirstPage"))
+                                return
+
+                            val topFiveQs = XposedHelpers.getObjectField(
+                                    param.thisObject, "mTopFiveQs") as ArrayList<View>
+                            topFiveQs.forEach { (it.parent as View).visibility = View.INVISIBLE }
+                        }
+                    })
+
+            findAndHookMethod(classQSAnimator, "clearAnimationState",
+                    object : XC_MethodHook() {
+                        @Suppress("UNCHECKED_CAST")
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val topFiveQs = XposedHelpers.getObjectField(
+                                    param.thisObject, "mTopFiveQs") as ArrayList<View>
+                            topFiveQs.forEach { (it.parent as View).visibility = View.VISIBLE }
+                        }
+                    })
+
+            findAndHookMethod(classQSPanel, "addDivider",
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val divider = XposedHelpers.getObjectField(param.thisObject, "mDivider") as View
+                            val context = divider.context
+
+                            divider.setBackgroundColor(applyAlpha(divider.alpha,
+                                    context.getColorAttr(android.R.attr.colorForeground)))
+                        }
+                    })
+        }
+
+        if (ConfigUtils.notifications.qsVerticalScroll) {
+            findAndHookMethod(classQSPanel, "setupTileLayout",
+                    object : XC_MethodHook() {
+                        override fun beforeHookedMethod(param: MethodHookParam) {
+                            val qsPanel = param.thisObject as ViewGroup
+                            val context = qsPanel.context
+
+                            val constructor = XposedHelpers.findConstructorExact(classTileLayout,
+                                    Context::class.java)
+                            val tileLayout = constructor.newInstance(context)
+                            XposedHelpers.callMethod(tileLayout, "setListening",
+                                    XposedHelpers.getObjectField(qsPanel, "mListening"))
+                            qsPanel.addView(tileLayout as View)
+                            XposedHelpers.setObjectField(qsPanel, "mTileLayout", tileLayout)
+                            param.result = null
+                        }
+                    })
+
+            findAndHookConstructor(classQSPanel, Context::class.java, AttributeSet::class.java,
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val qsPanel = param.thisObject as ViewGroup
+                            val context = qsPanel.context
+
+                            val brightnessView = XposedHelpers.getObjectField(qsPanel, "mBrightnessView") as View
+                            val tileLayout = XposedHelpers.getObjectField(qsPanel, "mTileLayout") as View
+                            val views = ArrayList<View>()
+                            var startIndex = -1
+                            for (i in (0 until qsPanel.childCount)) {
+                                val view = qsPanel.getChildAt(i)
+                                if (view === brightnessView || view === tileLayout) {
+                                    views.add(view)
+                                    if (startIndex == -1)
+                                        startIndex = i
+                                }
+                            }
+                            if (startIndex == -1)
+                                return
+
+                            qsPanel.removeView(brightnessView)
+                            qsPanel.removeView(tileLayout)
+                            tileLayout.isFocusable = false
+
+                            val scrollLayout = QSScrollLayout(context, *views.toTypedArray())
+                            scrollLayout.layoutParams = LinearLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT, 0).apply { weight = 1f }
+                            scrollLayout.id = R.id.qs_scroll_layout
+                            qsPanel.addView(scrollLayout, startIndex)
+                        }
+                    })
+
+            findAndHookMethod(classQSPanel, "setExpanded",
+                    Boolean::class.java, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    val qsPanel = param.thisObject as ViewGroup
+                    val mExpanded = XposedHelpers.getBooleanField(qsPanel, "mExpanded")
+                    val expanded = param.args[0] as Boolean
+                    if (mExpanded != expanded && !mExpanded) {
+                        val scrollLayout = qsPanel.findViewById<QSScrollLayout>(R.id.qs_scroll_layout)
+                        scrollLayout.scrollY = 0
                     }
-                })
+                }
+            })
 
-        findAndHookMethod(classQSAnimator, "clearAnimationState",
-                object : XC_MethodHook() {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun afterHookedMethod(param: MethodHookParam) {
-                        val topFiveQs = XposedHelpers.getObjectField(
-                                param.thisObject, "mTopFiveQs") as ArrayList<View>
-                        topFiveQs.forEach { (it.parent as View).visibility = View.VISIBLE }
+            findAndHookMethod(classQSPanel, "updateResources",
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val qsPanel = param.thisObject as ViewGroup
+                            val brightnessView = XposedHelpers.getObjectField(qsPanel, "mBrightnessView") as View
+
+                            brightnessView.setPadding(
+                                    brightnessView.paddingLeft,
+                                    qsPanel.paddingTop,
+                                    brightnessView.paddingRight,
+                                    brightnessView.paddingBottom)
+
+                            qsPanel.setPadding(0, 0, 0, qsPanel.paddingBottom)
+                        }
+                    })
+
+            findAndHookConstructor(classQSAnimator, classQS, classQuickQSPanel, classQSPanel,
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val qsPanel = param.args[2] as ViewGroup
+                            val scrollLayout = qsPanel.findViewById<QSScrollLayout>(R.id.qs_scroll_layout)
+                            scrollLayout.setOnScrollChangeListener { _, _, scrollY: Int, _, _ ->
+                                XposedHelpers.callMethod(param.thisObject, "onPageChanged", scrollY == 0)
+                            }
+                            param.result = null
+                        }
+                    })
+
+            findAndHookMethod(FrameLayout::class.java, "onMeasure",
+                    Int::class.java, Int::class.java, object : XC_MethodHook() {
+                var widthMeasureSpec = 0
+                var heightMeasureSpec = 0
+
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    if (!classQSContainerImpl.isInstance(param.thisObject)) return
+
+                    widthMeasureSpec = param.args[0] as Int
+                    heightMeasureSpec = param.args[1] as Int
+                    val qsContainer = param.thisObject as FrameLayout
+                    with(qsContainer) {
+                        val mSizePoint = XposedHelpers.getObjectField(qsContainer, "mSizePoint") as Point
+                        val mQSPanel = XposedHelpers.getObjectField(qsContainer, "mQSPanel") as View
+                        val mQSCustomizer = XposedHelpers.getObjectField(qsContainer, "mQSCustomizer") as View
+                        display.getRealSize(mSizePoint)
+                        val config = resources.configuration
+                        val navBelow = config.smallestScreenWidthDp >= 600 ||
+                                config.orientation != Configuration.ORIENTATION_LANDSCAPE
+
+                        val params = mQSPanel.layoutParams as MarginLayoutParams
+                        var maxQs = mSizePoint.y - params.topMargin -
+                                params.bottomMargin - paddingBottom -
+                                MainHook.modRes.getDimensionPixelSize(R.dimen.qs_notif_collapsed_space)
+                        if (navBelow) {
+                            maxQs -= resources.getDimensionPixelSize(resources.getIdentifier(
+                                    "navigation_bar_size", "dimen", MainHook.PACKAGE_SYSTEMUI))
+                        }
+                        mQSPanel.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxQs, MeasureSpec.AT_MOST))
+                        val layoutParams = mQSPanel.layoutParams as FrameLayout.LayoutParams
+                        val widthSpec = MeasureSpec.makeMeasureSpec(mQSPanel.measuredWidth, MeasureSpec.EXACTLY)
+                        val heightSpec = MeasureSpec.makeMeasureSpec(layoutParams.topMargin +
+                                layoutParams.bottomMargin + mQSPanel.measuredHeight, MeasureSpec.EXACTLY)
+                        XposedBridge.invokeOriginalMethod(param.method, param.thisObject,
+                                arrayOf(widthSpec, heightSpec))
+                        mQSCustomizer.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(mSizePoint.y, MeasureSpec.EXACTLY))
                     }
-                })
 
-        findAndHookMethod(classQSPanel, "addDivider",
-                object : XC_MethodHook() {
-                    override fun afterHookedMethod(param: MethodHookParam) {
-                        val divider = XposedHelpers.getObjectField(param.thisObject, "mDivider") as View
-                        val context = divider.context
+                    param.result = null
+                }
+            })
 
-                        divider.setBackgroundColor(applyAlpha(divider.alpha,
-                                context.getColorAttr(android.R.attr.colorForeground)))
-                    }
-                })
+            findAndHookMethod(ViewGroup::class.java, "onInterceptTouchEvent",
+                    MotionEvent::class.java, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    if (!classQSPanel.isInstance(param.thisObject)) return
+
+                    val qsPanel = param.thisObject as ViewGroup
+                    val event = param.args[0] as MotionEvent
+                    val mExpanded = XposedHelpers.getBooleanField(qsPanel, "mExpanded")
+                    val mScrollLayout = qsPanel.findViewById<QSScrollLayout>(R.id.qs_scroll_layout)
+                    val shouldIntercept = mScrollLayout.shouldIntercept(event)
+                    param.result = mExpanded && mScrollLayout.shouldIntercept(event)
+//                logI("onInterceptTouchEvent -> ${event.action}, $mExpanded && $shouldIntercept")
+                }
+            })
+        }
     }
 
     private fun getCircleColor(view: ViewGroup, state: Int): Int {
