@@ -18,4 +18,16 @@
         android:key="force_dark_theme"
         android:summary="@string/force_dark_theme_summary"
         android:title="@string/force_dark_theme_title"/>
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="circle_tile_background"
+        android:summary="@string/circle_tile_background_summary"
+        android:title="@string/circle_tile_background_title"/>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="qs_vertical_scroll"
+        android:summary="@string/qs_vertical_scroll_summary"
+        android:title="@string/qs_vertical_scroll_title"/>
 </PreferenceScreen>

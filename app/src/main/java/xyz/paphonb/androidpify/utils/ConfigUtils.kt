@@ -44,6 +44,8 @@ object ConfigUtils {
         val enableLeftClock = prefs.getBoolean(PreferencesList.enableLeftClock, true)
         val forceDarkTheme = prefs.getBoolean(PreferencesList.forceDarkTheme, false)
         val changePullDown = prefs.getBoolean(PreferencesList.changePullDown, true)
+        val circleTileBackground = prefs.getBoolean(PreferencesList.circleTileBackground, true)
+        val qsVerticalScroll = prefs.getBoolean(PreferencesList.qsVerticalScroll, false)
         val statusBarHeight = prefs.getInt(PreferencesList.statusBarHeight, 24)
     }
 

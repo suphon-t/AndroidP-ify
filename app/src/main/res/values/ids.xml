@@ -6,4 +6,5 @@
     <item name="signal_cluster" type="id" />
     <item name="quick_qs_footer_layout" type="id" />
     <item name="qs_tile_background" type="id" />
+    <item name="qs_scroll_layout" type="id" />
 </resources>
