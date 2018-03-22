@@ -827,13 +827,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     }
 
     private fun getBackground(context: Context): Drawable {
-        val foreground = context.getColorAttr(android.R.attr.colorForeground)
-        val ownResources = ResourceUtils.getInstance(context)
-        return if (foreground == Color.WHITE) {
-            ownResources.getDrawable(R.drawable.qs_background_primary_dark, context.theme)
-        } else {
-            ownResources.getDrawable(R.drawable.qs_background_primary, context.theme)
-        }
+        return ResourceUtils.getInstance(context)
+                .getDrawable(R.drawable.qs_background_primary, context.theme)
     }
 
     override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
