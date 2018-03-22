@@ -330,8 +330,6 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
     private fun blankArray() = arrayOf<Class<*>>()
 
     override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
-        if (resparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
-
         resparam.res.hookLayout(MainHook.PACKAGE_ANDROID, "layout", "notification_material_action",
                 object : XC_LayoutInflated() {
                     override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
