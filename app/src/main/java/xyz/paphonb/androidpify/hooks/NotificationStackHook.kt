@@ -23,6 +23,7 @@ import android.graphics.*
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
 import de.robv.android.xposed.IXposedHookInitPackageResources
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -30,10 +31,12 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
+import de.robv.android.xposed.callbacks.XC_LayoutInflated
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import xyz.paphonb.androidpify.MainHook
 import xyz.paphonb.androidpify.R
 import xyz.paphonb.androidpify.utils.ConfigUtils
+import xyz.paphonb.androidpify.utils.setGoogleSans
 import java.lang.ref.WeakReference
 
 @SuppressLint("StaticFieldLeak")
@@ -327,6 +330,15 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
     private fun blankArray() = arrayOf<Class<*>>()
 
     override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
-        // Blank for now
+        if (resparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
+
+        resparam.res.hookLayout(MainHook.PACKAGE_ANDROID, "layout", "notification_material_action",
+                object : XC_LayoutInflated() {
+                    override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
+                        val button = liparam.view as Button
+                        button.setAllCaps(false)
+                        button.setGoogleSans("Medium")
+                    }
+                })
     }
 }

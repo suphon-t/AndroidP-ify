@@ -26,7 +26,6 @@ import xyz.paphonb.androidpify.ui.SettingsActivity
 import xyz.paphonb.androidpify.utils.ConfigUtils
 
 
-
 object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInitPackageResources {
 
     private var MODULE_PATH = ""
@@ -62,6 +61,7 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
         NotificationStackHook.handleInitPackageResources(resparam)
         QuickSettingsHook.handleInitPackageResources(resparam)
         SettingsHook.handleInitPackageResources(resparam)
+        KeyguardHook.handleInitPackageResources(resparam)
     }
 
     val ATLEAST_O_MR1 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1
