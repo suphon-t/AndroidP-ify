@@ -68,8 +68,6 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classQuickQSPanel by lazy { XposedHelpers.findClass("com.android.systemui.qs.QuickQSPanel", classLoader) }
     private val classQS by lazy { XposedHelpers.findClass("com.android.systemui.plugins.qs.QS", classLoader) }
     private val classTileLayout by lazy { XposedHelpers.findClass("com.android.systemui.qs.TileLayout", classLoader) }
-    private val classPageListener by lazy { XposedHelpers.findClass("com.android.systemui.qs.PagedTileLayout\$PageListener", classLoader) }
-    private val classNotificationPanelView by lazy { XposedHelpers.findClass("com.android.systemui.statusbar.phone.NotificationPanelView", classLoader) }
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
@@ -211,13 +209,22 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         val header = param.thisObject as ViewGroup
                         val context = header.context
 
+                        val quickStatusBarIcons = context.resources.getIdentifierNullable(
+                                "quick_status_bar_icons", "id", MainHook.PACKAGE_SYSTEMUI)
+                        header.findViewById<View?>(quickStatusBarIcons)?.apply {
+                            header.removeViewAt(0)
+                        }
                         val systemIcons = header.getChildAt(0) as ViewGroup
                         val battery = systemIcons.findViewById<View>(context.resources.getIdentifier(
                                 "battery", "id", MainHook.PACKAGE_SYSTEMUI))
                         val foreground = Color.WHITE
                         val background = 0x4DFFFFFF
-                        XposedHelpers.callMethod(XposedHelpers.getObjectField(battery, "mDrawable"), "setColors", foreground, background)
-                        XposedHelpers.callMethod(battery, "setTextColor", foreground)
+                        try {
+                            XposedHelpers.callMethod(XposedHelpers.getObjectField(battery, "mDrawable"), "setColors", foreground, background)
+                            XposedHelpers.callMethod(battery, "setTextColor", foreground)
+                        } catch (ignored : Throwable) {
+
+                        }
 
                         if (!MainHook.ATLEAST_O_MR1) {
                             systemIcons.layoutParams.height = MainHook.modRes
@@ -233,18 +240,34 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         clock.setPadding(clock.paddingRight, clock.paddingTop,
                                 clock.paddingLeft, clock.paddingBottom)
 
+                        systemIcons.findViewById<View?>(context.resources.getIdentifierNullable(
+                                "left_clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
+                            systemIcons.removeView(this)
+                            systemIcons.addView(this, 0)
+                        }
+
                         systemIcons.id = R.id.quick_qs_system_icons
 
                         val quickQsStatusIcons = LinearLayout(context)
                         quickQsStatusIcons.id = R.id.quick_qs_status_icons
 
                         val ownResources = ResourceUtils.createOwnContext(context).resources
-                        quickQsStatusIcons.layoutParams = RelativeLayout.LayoutParams(
-                                RelativeLayout.LayoutParams.MATCH_PARENT,
-                                ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
-                            addRule(RelativeLayout.BELOW, R.id.quick_qs_system_icons)
-                            topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top)
-                            bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
+                        if (header is RelativeLayout) {
+                            quickQsStatusIcons.layoutParams = RelativeLayout.LayoutParams(
+                                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                                    ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
+                                addRule(RelativeLayout.BELOW, R.id.quick_qs_system_icons)
+                                topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top)
+                                bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
+                            }
+                        } else {
+                            quickQsStatusIcons.layoutParams = FrameLayout.LayoutParams(
+                                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                                    ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
+                                topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top) +
+                                        systemIcons.layoutParams.height
+                                bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
+                            }
                         }
                         header.addView(quickQsStatusIcons, 0)
 
@@ -425,6 +448,13 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         footer.addView(layout)
                     }
                 })
+
+        try {
+            findAndHookMethod(classQuickStatusBarHeader, "onTuningChanged",
+                    String::class.java, String::class.java, XC_MethodReplacement.DO_NOTHING)
+        } catch (ignored: Throwable) {
+
+        }
 
         if (ConfigUtils.notifications.circleTileBackground) {
             findAndHookConstructor(classQSTileBaseView, Context::class.java,
@@ -737,5 +767,14 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
         }
         resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "status_bar_header_height",
                 MainHook.modRes.fwd(R.dimen.quick_qs_total_height))
+        try {
+            // Fix weird top margin on panel with scrollable QuickQS
+            resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "qs_scroller_top_margin",
+                    MainHook.modRes.fwd(R.dimen.zero))
+            resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "qs_panel_margin_top",
+                    MainHook.modRes.fwd(R.dimen.quick_qs_offset_height))
+        } catch (ignored: Throwable) {
+
+        }
     }
 }
