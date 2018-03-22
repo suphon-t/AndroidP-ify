@@ -25,9 +25,6 @@ import xyz.paphonb.androidpify.aosp.QSScrollLayout
 import xyz.paphonb.androidpify.aosp.StatusIconContainer
 import xyz.paphonb.androidpify.utils.*
 
-
-
-
 /*
  * Copyright (C) 2018 paphonb@xda
  *
@@ -147,6 +144,11 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         }
 
                         qsContainer.findViewById<View>(context.resources.getIdentifier("quick_qs_panel", "id", MainHook.PACKAGE_SYSTEMUI)).apply {
+                            if (parent is HorizontalScrollView) {
+                                val scrollView = parent as View
+                                val scrollContainer = scrollView.parent as View
+                                (scrollContainer.layoutParams as MarginLayoutParams).topMargin = 0
+                            }
                             (layoutParams as ViewGroup.MarginLayoutParams).topMargin = ownContext
                                     .resources.getDimensionPixelSize(R.dimen.quick_qs_top_margin)
                         }
