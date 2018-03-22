@@ -70,6 +70,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classSignalTileView by lazy { XposedHelpers.findClass("com.android.systemui.qs.SignalTileView", classLoader) }
     private val classCellTileView by lazy { XposedHelpers.findClass("com.android.systemui.qs.CellTileView", classLoader) }
     private val classSignalIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.CellTileView\$SignalIcon", classLoader) }
+    private val classBatteryMeterView by lazy { XposedHelpers.findClass("com.android.systemui.BatteryMeterView", classLoader) }
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
@@ -794,6 +795,19 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                 }
             })
         }
+
+        findAndHookMethod(classBatteryMeterView, "updateShowPercent",
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        val layout = param.thisObject as ViewGroup
+                        if (layout.childCount == 2 && layout.getChildAt(0) is TextView) {
+                            val text = layout.getChildAt(0) as TextView
+                            text.setPadding(text.paddingRight, text.paddingTop, text.paddingLeft, text.paddingBottom)
+                            layout.removeViewAt(0)
+                            layout.addView(text, 1)
+                        }
+                    }
+                })
     }
 
     private fun getCircleColor(view: ViewGroup, state: Int): Int {
