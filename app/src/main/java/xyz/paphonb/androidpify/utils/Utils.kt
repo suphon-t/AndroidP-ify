@@ -17,6 +17,7 @@
 package xyz.paphonb.androidpify.utils
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.support.annotation.ColorInt
@@ -87,4 +88,12 @@ fun Any.logI(msg: String) {
 
 fun Any.logE(msg: String, throwable: Throwable? = null) {
     MainHook.logE(javaClass.simpleName, msg, throwable)
+}
+
+fun Resources.getIdentifierNullable(name: String, defType: String, defPackage: String): Int {
+    return try {
+        getIdentifier(name, defType, defPackage)
+    } catch (ignored: Throwable) {
+        0
+    }
 }
