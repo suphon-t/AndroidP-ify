@@ -108,6 +108,7 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
     fun shouldChangeIcon(): Boolean {
         Throwable().stackTrace.forEach { element ->
             if (element.className.startsWith("android.s")) return false
+            if (element.methodName == "updateConditionIcons") return false
             if (element.methodName == "onBindSuggestionConditionHeader") return false
             if (element.className.endsWith("DashboardAdapter")) return true
             if (element.className.endsWith("SuggestionAdapter")) return false
