@@ -67,7 +67,7 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                 val context = param.args[0] as Context
 
                 if (shouldChangeIcon()) {
-                    val ownResource = ResourceUtils.createOwnContext(context).resources
+                    val ownResource = ResourceUtils.getInstance(context)
                     val mType = XposedHelpers.getIntField(icon, "mType")
                     if (mType == 2) {
                         val resPackage = XposedHelpers.callMethod(icon, "getResPackage") as String
@@ -141,7 +141,7 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                             "search_action_bar", "id", MainHook.PACKAGE_SETTINGS)
                     val searchActionBar = layout.findViewById<ViewGroup>(searchActionBarId)
                             ?: return
-                    val ownContext = ResourceUtils.createOwnContext(context)
+                    val ownContext = ResourceUtils.getInstance(context).context
                     LayoutInflater.from(ContextThemeWrapper(ownContext, context.theme)).inflate(
                             R.layout.search_bar_text, searchActionBar, true)
                     val title = XposedHelpers.callMethod(searchActionBar, "getTitle") as CharSequence
@@ -160,7 +160,7 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                     object : XC_LayoutInflated() {
                         override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
                             val context = liparam.view.context
-                            val ownResources = ResourceUtils.createOwnContext(context).resources
+                            val ownResources = ResourceUtils.getInstance(context)
                             val padding = ownResources.getDimensionPixelSize(R.dimen.settings_suggestion_padding)
                             val radius = ownResources.getDimensionPixelSize(R.dimen.settings_card_radius)
                             liparam.view.setPadding(padding, liparam.view.paddingTop,
