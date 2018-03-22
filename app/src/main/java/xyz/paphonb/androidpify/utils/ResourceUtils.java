@@ -18,6 +18,7 @@ package xyz.paphonb.androidpify.utils;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
@@ -112,6 +113,10 @@ public class ResourceUtils {
     @NonNull
     public Resources getResources() {
         return mContext.getResources();
+    }
+
+    public AssetManager getAssets() {
+        return mContext.getAssets();
     }
 
 }

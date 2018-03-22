@@ -19,8 +19,10 @@ package xyz.paphonb.androidpify.utils
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.support.annotation.ColorInt
+import android.widget.TextView
 import xyz.paphonb.androidpify.MainHook
 
 
@@ -96,4 +98,8 @@ fun Resources.getIdentifierNullable(name: String, defType: String, defPackage: S
     } catch (ignored: Throwable) {
         0
     }
+}
+
+fun TextView.setGoogleSans(style: String = "Regular") {
+    typeface = Typeface.createFromAsset(ResourceUtils.getInstance(context).assets, "fonts/GoogleSans-$style.ttf")
 }
