@@ -25,6 +25,7 @@ object PreferencesList {
             put(changePullDown, LEVEL_SYSTEM_UI)
             put(circleTileBackground, LEVEL_SYSTEM_UI)
             put(qsVerticalScroll, LEVEL_SYSTEM_UI)
+            put(swapQsAndBrightness, LEVEL_SYSTEM_UI)
             put(statusBarHeight, LEVEL_ANDROID)
         }
     }
@@ -34,6 +35,7 @@ object PreferencesList {
     const val changePullDown = "change_pull_down"
     const val circleTileBackground = "circle_tile_background"
     const val qsVerticalScroll = "qs_vertical_scroll"
+    const val swapQsAndBrightness = "swap_qs_and_brightness"
     const val statusBarHeight = "status_bar_height"
 
     const val changeSettingsTheme = "change_settings_theme"

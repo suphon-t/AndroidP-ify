@@ -30,4 +30,9 @@
         android:key="qs_vertical_scroll"
         android:summary="@string/qs_vertical_scroll_summary"
         android:title="@string/qs_vertical_scroll_title"/>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="swap_qs_and_brightness"
+        android:title="@string/swap_qs_and_brightness_title"/>
 </PreferenceScreen>
