@@ -23,6 +23,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.Icon
 import android.graphics.drawable.LayerDrawable
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -140,7 +141,8 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                             "search_action_bar", "id", MainHook.PACKAGE_SETTINGS)
                     val searchActionBar = layout.findViewById<ViewGroup>(searchActionBarId)
                             ?: return
-                    LayoutInflater.from(ResourceUtils.createOwnContext(context)).inflate(
+                    val ownContext = ResourceUtils.createOwnContext(context)
+                    LayoutInflater.from(ContextThemeWrapper(ownContext, context.theme)).inflate(
                             R.layout.search_bar_text, searchActionBar, true)
                     val title = XposedHelpers.callMethod(searchActionBar, "getTitle") as CharSequence
                     searchActionBar.findViewById<TextView>(R.id.search_action_bar_title).text = title
