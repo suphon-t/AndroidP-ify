@@ -25,6 +25,7 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.TextView
 import de.robv.android.xposed.IXposedHookInitPackageResources
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
@@ -336,6 +337,17 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                         val button = liparam.view as Button
                         button.setAllCaps(false)
                         button.setGoogleSans("Medium")
+                    }
+                })
+
+        if (resparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
+
+        resparam.res.hookLayout(MainHook.PACKAGE_SYSTEMUI, "layout", "status_bar_notification_dismiss_all",
+                object : XC_LayoutInflated() {
+                    override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
+                        val id = liparam.view.context.resources.getIdentifier(
+                                "dismiss_text", "id", MainHook.PACKAGE_SYSTEMUI)
+                        liparam.view.findViewById<TextView>(id)?.setGoogleSans()
                     }
                 })
     }
