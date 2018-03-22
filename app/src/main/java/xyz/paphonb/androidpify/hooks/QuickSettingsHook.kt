@@ -68,6 +68,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
+    val qsHeaderSystemIconsAreaHeight by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.qs_header_system_icons_area_height) }
+    val qsNotifCollapsedSpace by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.qs_notif_collapsed_space) }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (lpparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
@@ -80,8 +82,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val qsContainer = param.thisObject as ViewGroup
                         val context = qsContainer.context
-                        val ownContext = ResourceUtils.createOwnContext(context)
-                        val qsElevation = ownContext.resources.getDimensionPixelSize(R.dimen.qs_background_elevation).toFloat()
+                        val ownResources = ResourceUtils.getInstance(context)
+                        val qsElevation = ownResources.getDimensionPixelSize(R.dimen.qs_background_elevation).toFloat()
 
                         if (!MainHook.ATLEAST_O_MR1) {
                             qsContainer.removeViewAt(0)
@@ -102,23 +104,23 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                             id = R.id.quick_settings_status_bar_background
                             background = ColorDrawable(0xFF000000.toInt())
                             layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ownContext.resources.getDimensionPixelOffset(R.dimen.quick_qs_offset_height))
+                                    ownResources.getDimensionPixelSize(R.dimen.quick_qs_offset_height))
                         }, 1)
 
                         qsContainer.addView(View(context).apply {
                             id = R.id.quick_settings_gradient_view
-                            background = ownContext.resources.getDrawable(R.drawable.qs_bg_gradient)
+                            background = ownResources.getDrawable(R.drawable.qs_bg_gradient)
                             layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ownContext.resources.getDimensionPixelOffset(R.dimen.qs_gradient_height)).apply {
-                                topMargin = ownContext.resources.getDimensionPixelOffset(R.dimen.quick_qs_offset_height)
+                                    ownResources.getDimensionPixelSize(R.dimen.qs_gradient_height)).apply {
+                                topMargin = ownResources.getDimensionPixelSize(R.dimen.quick_qs_offset_height)
                             }
                         }, 2)
 
                         (XposedHelpers.getObjectField(param.thisObject, "mQSPanel") as View).apply {
                             elevation = qsElevation
                             setMargins(this)
-                            (layoutParams as FrameLayout.LayoutParams).topMargin = ownContext
-                                    .resources.getDimensionPixelSize(R.dimen.quick_qs_offset_height)
+                            (layoutParams as FrameLayout.LayoutParams).topMargin = ownResources
+                                    .getDimensionPixelSize(R.dimen.quick_qs_offset_height)
                         }
 
                         (XposedHelpers.getObjectField(param.thisObject, "mQSFooter") as View).apply {
@@ -149,8 +151,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                                 val scrollContainer = scrollView.parent as View
                                 (scrollContainer.layoutParams as MarginLayoutParams).topMargin = 0
                             }
-                            (layoutParams as ViewGroup.MarginLayoutParams).topMargin = ownContext
-                                    .resources.getDimensionPixelSize(R.dimen.quick_qs_top_margin)
+                            (layoutParams as ViewGroup.MarginLayoutParams).topMargin = ownResources
+                                    .getDimensionPixelSize(R.dimen.quick_qs_top_margin)
                         }
 
                         // Swap CarrierText with DateView
@@ -158,8 +160,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                                 "qs_carrier_text", "id", MainHook.PACKAGE_SYSTEMUI))
                         (carrierText.parent as ViewGroup).removeView(carrierText)
 
-                        val datePaddings = ownContext.resources
-                                .getDimensionPixelSize(R.dimen.quick_qs_date_padding)
+                        val datePaddings = ownResources.getDimensionPixelSize(R.dimen.quick_qs_date_padding)
                         val date = qsContainer.findViewById<TextView>(context.resources.getIdentifier(
                                 "date", "id", MainHook.PACKAGE_SYSTEMUI))
                         date.setTextColor(Color.WHITE)
@@ -229,8 +230,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         }
 
                         if (!MainHook.ATLEAST_O_MR1) {
-                            systemIcons.layoutParams.height = MainHook.modRes
-                                    .getDimensionPixelSize(R.dimen.qs_header_system_icons_area_height)
+                            systemIcons.layoutParams.height = qsHeaderSystemIconsAreaHeight
                         }
 
                         // Move clock to left side
@@ -253,7 +253,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         val quickQsStatusIcons = LinearLayout(context)
                         quickQsStatusIcons.id = R.id.quick_qs_status_icons
 
-                        val ownResources = ResourceUtils.createOwnContext(context).resources
+                        val ownResources = ResourceUtils.getInstance(context)
                         if (header is RelativeLayout) {
                             quickQsStatusIcons.layoutParams = RelativeLayout.LayoutParams(
                                     RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -435,7 +435,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                             }
                         }
 
-                        LayoutInflater.from(ResourceUtils.createOwnContext(context))
+                        LayoutInflater.from(ResourceUtils.getInstance(context).context)
                                 .inflate(R.layout.qs_pull_handle, layout, true)
 
                         footer.getChildAt(0).apply {
@@ -464,11 +464,12 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                 override fun afterHookedMethod(param: MethodHookParam) {
                     val iconFrame = XposedHelpers.getObjectField(param.thisObject, "mIconFrame") as ViewGroup
                     val context = iconFrame.context
+                    val ownResources = ResourceUtils.getInstance(context)
 
                     ImageView(context).apply {
                         id = R.id.qs_tile_background
                         scaleType = ImageView.ScaleType.FIT_CENTER
-                        setImageDrawable(MainHook.modRes.getDrawable(R.drawable.ic_qs_circle))
+                        setImageDrawable(ownResources.getDrawable(R.drawable.ic_qs_circle))
                         iconFrame.addView(this, 0)
                     }
 
@@ -680,7 +681,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         val params = mQSPanel.layoutParams as MarginLayoutParams
                         var maxQs = mSizePoint.y - params.topMargin -
                                 params.bottomMargin - paddingBottom -
-                                MainHook.modRes.getDimensionPixelSize(R.dimen.qs_notif_collapsed_space)
+                                qsNotifCollapsedSpace
                         if (navBelow) {
                             maxQs -= resources.getDimensionPixelSize(resources.getIdentifier(
                                     "navigation_bar_size", "dimen", MainHook.PACKAGE_SYSTEMUI))
@@ -748,7 +749,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
 
     private fun getBackground(context: Context): Drawable {
         val foreground = context.getColorAttr(android.R.attr.colorForeground)
-        val ownResources = ResourceUtils.createOwnContext(context).resources
+        val ownResources = ResourceUtils.getInstance(context)
         return if (foreground == Color.WHITE) {
             ownResources.getDrawable(R.drawable.qs_background_primary_dark, context.theme)
         } else {

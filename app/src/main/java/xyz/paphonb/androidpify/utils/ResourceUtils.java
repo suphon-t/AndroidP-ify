@@ -84,6 +84,12 @@ public class ResourceUtils {
     }
 
     @NonNull
+    public final Drawable getDrawable(@DrawableRes int resId, Resources.Theme theme) {
+        //noinspection deprecation
+        return mContext.getResources().getDrawable(resId, theme);
+    }
+
+    @NonNull
     public final String getString(@StringRes int resId) {
         return mContext.getResources().getString(resId);
     }
@@ -96,6 +102,11 @@ public class ResourceUtils {
     @NonNull
     public CharSequence getText(@StringRes int resId) {
         return mContext.getResources().getText(resId);
+    }
+
+    @NonNull
+    public Context getContext() {
+        return mContext;
     }
 
     @NonNull
