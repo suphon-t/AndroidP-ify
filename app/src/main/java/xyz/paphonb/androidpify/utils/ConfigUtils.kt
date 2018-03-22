@@ -46,6 +46,7 @@ object ConfigUtils {
         val changePullDown = prefs.getBoolean(PreferencesList.changePullDown, true)
         val circleTileBackground = prefs.getBoolean(PreferencesList.circleTileBackground, true)
         val qsVerticalScroll = prefs.getBoolean(PreferencesList.qsVerticalScroll, false)
+        val swapQsAndBrightness = prefs.getBoolean(PreferencesList.swapQsAndBrightness, false)
         val statusBarHeight = prefs.getInt(PreferencesList.statusBarHeight, 24)
     }
 

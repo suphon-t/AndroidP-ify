@@ -38,4 +38,5 @@
     <string name="qs_vertical_scroll_title">QS vertical scroll</string>
     <string name="qs_vertical_scroll_summary">Replace paginated qs with vertical scrollable grid (very buggy)</string>
     <string name="status_bar_alarm">Alarm</string>
+    <string name="swap_qs_and_brightness_title">Swap quick settings and brightness slider</string>
 </resources>

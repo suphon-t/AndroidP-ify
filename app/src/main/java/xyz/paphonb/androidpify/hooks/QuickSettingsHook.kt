@@ -24,6 +24,8 @@ import xyz.paphonb.androidpify.R
 import xyz.paphonb.androidpify.aosp.QSScrollLayout
 import xyz.paphonb.androidpify.aosp.StatusIconContainer
 import xyz.paphonb.androidpify.utils.*
+import kotlin.math.max
+import kotlin.math.min
 
 /*
  * Copyright (C) 2018 paphonb@xda
@@ -635,6 +637,47 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
             })
         }
 
+        if (ConfigUtils.notifications.qsVerticalScroll || ConfigUtils.notifications.swapQsAndBrightness) {
+            findAndHookConstructor(classQSPanel, Context::class.java, AttributeSet::class.java,
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val qsPanel = param.thisObject as ViewGroup
+                            val context = qsPanel.context
+
+                            val brightnessView = XposedHelpers.getObjectField(qsPanel, "mBrightnessView") as View
+                            val tileLayout = XposedHelpers.getObjectField(qsPanel, "mTileLayout") as View
+
+                            val swap = ConfigUtils.notifications.swapQsAndBrightness
+                            val brightnessIndex = qsPanel.indexOfChild(brightnessView)
+                            val tileLayoutIndex = qsPanel.indexOfChild(tileLayout)
+                            val minIndex = min(brightnessIndex, tileLayoutIndex)
+                            val maxIndex = max(brightnessIndex, tileLayoutIndex)
+                            val brightnessFirst = with(brightnessIndex < tileLayoutIndex) {
+                                if (swap) !this else this
+                            }
+
+                            qsPanel.removeViewAt(maxIndex)
+                            qsPanel.removeViewAt(minIndex)
+
+                            if (ConfigUtils.notifications.qsVerticalScroll) {
+                                val views = if (brightnessFirst)
+                                    arrayOf(brightnessView, tileLayout)
+                                else
+                                    arrayOf(tileLayout, brightnessView)
+                                tileLayout.isFocusable = false
+                                val scrollLayout = QSScrollLayout(context, *views)
+                                scrollLayout.layoutParams = LinearLayout.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT, 0).apply { weight = 1f }
+                                scrollLayout.id = R.id.qs_scroll_layout
+                                qsPanel.addView(scrollLayout, minIndex)
+                            } else {
+                                qsPanel.addView(if (brightnessFirst) brightnessView else tileLayout, minIndex)
+                                qsPanel.addView(if (brightnessFirst) tileLayout else brightnessView, maxIndex)
+                            }
+                        }
+                    })
+        }
+
         if (ConfigUtils.notifications.qsVerticalScroll) {
             findAndHookMethod(classQSPanel, "setupTileLayout",
                     object : XC_MethodHook() {
@@ -650,39 +693,6 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                             qsPanel.addView(tileLayout as View)
                             XposedHelpers.setObjectField(qsPanel, "mTileLayout", tileLayout)
                             param.result = null
-                        }
-                    })
-
-            findAndHookConstructor(classQSPanel, Context::class.java, AttributeSet::class.java,
-                    object : XC_MethodHook() {
-                        override fun afterHookedMethod(param: MethodHookParam) {
-                            val qsPanel = param.thisObject as ViewGroup
-                            val context = qsPanel.context
-
-                            val brightnessView = XposedHelpers.getObjectField(qsPanel, "mBrightnessView") as View
-                            val tileLayout = XposedHelpers.getObjectField(qsPanel, "mTileLayout") as View
-                            val views = ArrayList<View>()
-                            var startIndex = -1
-                            for (i in (0 until qsPanel.childCount)) {
-                                val view = qsPanel.getChildAt(i)
-                                if (view === brightnessView || view === tileLayout) {
-                                    views.add(view)
-                                    if (startIndex == -1)
-                                        startIndex = i
-                                }
-                            }
-                            if (startIndex == -1)
-                                return
-
-                            qsPanel.removeView(brightnessView)
-                            qsPanel.removeView(tileLayout)
-                            tileLayout.isFocusable = false
-
-                            val scrollLayout = QSScrollLayout(context, *views.toTypedArray())
-                            scrollLayout.layoutParams = LinearLayout.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT, 0).apply { weight = 1f }
-                            scrollLayout.id = R.id.qs_scroll_layout
-                            qsPanel.addView(scrollLayout, startIndex)
                         }
                     })
 
