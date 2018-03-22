@@ -65,11 +65,15 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classQuickQSPanel by lazy { XposedHelpers.findClass("com.android.systemui.qs.QuickQSPanel", classLoader) }
     private val classQS by lazy { XposedHelpers.findClass("com.android.systemui.plugins.qs.QS", classLoader) }
     private val classTileLayout by lazy { XposedHelpers.findClass("com.android.systemui.qs.TileLayout", classLoader) }
+    private val classSignalTileView by lazy { XposedHelpers.findClass("com.android.systemui.qs.SignalTileView", classLoader) }
+    private val classCellTileView by lazy { XposedHelpers.findClass("com.android.systemui.qs.CellTileView", classLoader) }
+    private val classSignalIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.CellTileView\$SignalIcon", classLoader) }
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
     val qsHeaderSystemIconsAreaHeight by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.qs_header_system_icons_area_height) }
     val qsNotifCollapsedSpace by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.qs_notif_collapsed_space) }
+    val signalIndicatorToIconFrameSpacing by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.signal_indicator_to_icon_frame_spacing) }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (lpparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
@@ -473,6 +477,9 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         iconFrame.addView(this, 0)
                     }
 
+                    iconFrame.clipChildren = false
+                    iconFrame.clipToPadding = false
+
                     XposedHelpers.setAdditionalInstanceField(param.thisObject, "mCircleColor", 0)
                     XposedHelpers.setAdditionalInstanceField(param.thisObject, "mColorActive",
                             context.getColorAccent())
@@ -564,6 +571,68 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                                     context.getColorAttr(android.R.attr.colorForeground)))
                         }
                     })
+
+            findAndHookConstructor(classSignalTileView, Context::class.java, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    (param.thisObject as ViewGroup).apply {
+                        clipChildren = false
+                        clipToPadding = false
+                    }
+                }
+            })
+
+            findAndHookMethod(classSignalTileView, "createIcon",
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val mOverlay = XposedHelpers.getObjectField(param.thisObject, "mOverlay") as ImageView
+                            mOverlay.imageTintList = ColorStateList.valueOf(Color.WHITE)
+                        }
+                    })
+
+            findAndHookMethod(classSignalTileView, "layoutIndicator",
+                    View::class.java, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    (param.thisObject as ViewGroup).apply {
+                        val indicator = param.args[0] as ImageView
+                        indicator.imageTintList = ColorStateList.valueOf(indicator.context.getColorAccent())
+
+                        val mIconFrame = XposedHelpers.getObjectField(this, "mIconFrame") as View
+                        val isRtl = layoutDirection == View.LAYOUT_DIRECTION_RTL
+                        val left: Int
+                        val right: Int
+                        if (isRtl) {
+                            right = getLeft() - signalIndicatorToIconFrameSpacing
+                            left = right - indicator.measuredWidth
+                        } else {
+                            left = getRight() + signalIndicatorToIconFrameSpacing
+                            right = left + indicator.measuredWidth
+                        }
+                        indicator.layout(
+                                left,
+                                mIconFrame.bottom - indicator.measuredHeight,
+                                right,
+                                mIconFrame.bottom)
+                    }
+                    param.result = null
+                }
+            })
+
+            findAndHookConstructor(classCellTileView, Context::class.java, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val drawable = XposedHelpers.getObjectField(param.thisObject, "mSignalDrawable")
+                    XposedHelpers.callMethod(drawable, "setColors",
+                            0x4dffffff, Color.WHITE)
+                }
+            })
+
+            findAndHookMethod(classSignalIcon, "getDrawable",
+                    Context::class.java, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val drawable = param.result
+                    XposedHelpers.callMethod(drawable, "setColors",
+                            0x4dffffff, Color.WHITE)
+                }
+            })
         }
 
         if (ConfigUtils.notifications.qsVerticalScroll) {
