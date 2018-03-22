@@ -37,4 +37,5 @@
     <string name="circle_tile_background_summary">Show circle background under qs tiles</string>
     <string name="qs_vertical_scroll_title">QS vertical scroll</string>
     <string name="qs_vertical_scroll_summary">Replace paginated qs with vertical scrollable grid (very buggy)</string>
+    <string name="status_bar_alarm">Alarm</string>
 </resources>
