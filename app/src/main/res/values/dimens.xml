@@ -29,4 +29,5 @@
     <dimen name="dashboard_tile_foreground_image_inset">6dp</dimen>
     <dimen name="dashboard_tile_image_margin">18dp</dimen>
     <dimen name="qs_notif_collapsed_space">72dp</dimen>
+    <dimen name="signal_indicator_to_icon_frame_spacing">3dp</dimen>
 </resources>
