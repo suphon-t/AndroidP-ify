@@ -14,75 +14,71 @@
  * limitations under the License.
  */
 
-package xyz.paphonb.androidpify.hooks
+package xyz.paphonb.androidpify.hooks.helpers
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Outline
 import android.graphics.Path
 import android.graphics.Rect
+import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
+import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
+import xyz.paphonb.androidpify.hooks.NotificationStackHook
+import xyz.paphonb.androidpify.utils.logI
 
-open class ExpandableOutlineViewHelper(private val expandableOutlineView: ViewGroup) {
+
+open class ExpandableOutlineViewHelper(classLoader: ClassLoader, target: ViewGroup)
+    : ObjectHelper<ViewGroup>(classLoader, target) {
 
     private val EMPTY_PATH = Path()
     private var mCurrentBottomRoundness = 0f
     private var mCurrentTopRoundness = 0f
     private var mBottomRoundness = 0f
     private var mTopRoundness = 0f
-    private val mBackgroundTop: Int = 0
+    private var mBackgroundTop: Int = 0
     private var mClipRoundedToClipTopAmount: Boolean = false
     private var mDistanceToTopRoundness: Float = -1f
     private val mClipPath = Path()
-    private var mOutlineRadius = 0
+    private val mOutlineRadius get() = NotificationStackHook.mCornerRadius
     private val mTmpPath = Path()
     private val mTmpPath2 = Path()
 
     private val mProvider = object : ViewOutlineProvider() {
         override fun getOutline(view: View, outline: Outline) {
-            with(expandableOutlineView) {
-                if (isCustomOutline() || mCurrentTopRoundness != 0.0f || mCurrentBottomRoundness != 0.0f) {
+            with(target) {
+                if (isCustomOutline() || mCurrentTopRoundness != 0f || mCurrentBottomRoundness != 0f) {
                     val clipPath = getClipPath()
                     if (clipPath.isConvex) {
                         outline.setConvexPath(clipPath)
                     }
                 } else {
-                    val translation = translationX
-                    val top = getClipTopAmount() + mBackgroundTop
-                    outline.setRect(Math.max(translation.toInt(), 0), top,
-                            width + Math.min(translation.toInt(), 0),
-                            Math.max(getActualHeight() - getClipBottomAmount(), top))
+                    val shouldTranslateContents = XposedHelpers.getBooleanField(this, "mShouldTranslateContents")
+                    val translation = if (shouldTranslateContents) getTranslation().toInt() else 0
+                    val mClipTopAmount = getClipTopAmount()
+                    val mClipBottomAmount = getClipBottomAmount()
+                    val top = mClipTopAmount + mBackgroundTop
+                    outline.setRect(Math.max(translation, 0), top, width + Math.min(translation, 0), Math.max(getActualHeight() - mClipBottomAmount, top))
                 }
-                outline.alpha = NotificationStackHook.fieldOutlineAlpha.getFloat(this)
-
-//                val translation = translationX.toInt()
-//                if (!isCustomOutline()) {
-//                    outline.setRoundRect(translation,
-//                            getClipTopAmount(),
-//                            width + translation,
-//                            Math.max(getActualHeight() - getClipBottomAmount(), getClipTopAmount()),
-//                            mOutlineRadius.toFloat())
-//                } else {
-//                    outline.setRoundRect(NotificationStackHook.fieldOutlineRect.get(this) as Rect, mOutlineRadius.toFloat())
-//                }
-//                outline.alpha = NotificationStackHook.fieldOutlineAlpha.getFloat(this)
+                outline.alpha = XposedHelpers.getFloatField(this, "mOutlineAlpha")
             }
         }
     }
 
-    init {
-//        XposedHelpers.setObjectField(expandableOutlineView, "mProvider", mProvider)
-//        expandableOutlineView.outlineProvider =
-//                XposedHelpers.getObjectField(expandableOutlineView, "mProvider") as ViewOutlineProvider
+    fun afterInit() {
+        XposedHelpers.setObjectField(target, "mProvider", mProvider)
+        target.outlineProvider =
+                XposedHelpers.getObjectField(target, "mProvider") as ViewOutlineProvider
     }
 
     fun setDistanceToTopRoundness(distanceToTopRoundness: Float) {
         if (distanceToTopRoundness != mDistanceToTopRoundness) {
             mClipRoundedToClipTopAmount = distanceToTopRoundness >= 0.0f
             mDistanceToTopRoundness = distanceToTopRoundness
-            expandableOutlineView.invalidate()
+            target.invalidate()
         }
     }
 
@@ -91,14 +87,14 @@ open class ExpandableOutlineViewHelper(private val expandableOutlineView: ViewGr
     }
 
     fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
-        with(expandableOutlineView) {
+        with(target) {
             canvas.save()
             var intersectPath: Path? = null
+            val mClipTopAmount = getClipTopAmount()
+            val mClipBottomAmount = getClipBottomAmount()
             if (mClipRoundedToClipTopAmount) {
-                val top = (getClipTopAmount().toFloat() - mDistanceToTopRoundness).toInt()
-                getRoundedRectPath(0, top, width,
-                        Math.max((getActualHeight() - getClipBottomAmount()).toFloat(), top.toFloat() + mOutlineRadius).toInt(),
-                        mOutlineRadius.toFloat(), 0.0f, mClipPath)
+                val top = (mClipTopAmount.toFloat() - mDistanceToTopRoundness).toInt()
+                getRoundedRectPath(0, top, width, Math.max((getActualHeight() - mClipBottomAmount).toFloat(), top.toFloat() + mOutlineRadius).toInt(), mOutlineRadius.toFloat(), 0.0f, mClipPath)
                 intersectPath = mClipPath
             }
             var clipped = false
@@ -116,9 +112,37 @@ open class ExpandableOutlineViewHelper(private val expandableOutlineView: ViewGr
             if (!(clipped || intersectPath == null)) {
                 canvas.clipPath(intersectPath)
             }
-            val result = XposedHelpers.callMethod(child, "draw", canvas, expandableOutlineView, drawingTime) as Boolean
+            val result = XposedHelpers.callMethod(child, "draw", canvas, this, drawingTime) as Boolean
             canvas.restore()
             return result
+
+//            canvas.save()
+//            var intersectPath: Path? = null
+//            if (mClipRoundedToClipTopAmount) {
+//                val top = (getClipTopAmount().toFloat() - mDistanceToTopRoundness).toInt()
+//                getRoundedRectPath(0, top, width,
+//                        Math.max((getActualHeight() - getClipBottomAmount()).toFloat(), top.toFloat() + mOutlineRadius).toInt(),
+//                        mOutlineRadius.toFloat(), 0.0f, mClipPath)
+//                intersectPath = mClipPath
+//            }
+//            var clipped = false
+//            if (childNeedsClipping(child)) {
+//                var clipPath = getCustomClipPath(child)
+//                if (clipPath == null) {
+//                    clipPath = getClipPath()
+//                }
+//                if (intersectPath != null) {
+//                    clipPath.op(intersectPath, Path.Op.INTERSECT)
+//                }
+//                canvas.clipPath(clipPath)
+//                clipped = true
+//            }
+//            if (!(clipped || intersectPath == null)) {
+//                canvas.clipPath(intersectPath)
+//            }
+//            val result = XposedHelpers.callMethod(child, "draw", canvas, target, drawingTime) as Boolean
+//            canvas.restore()
+//            return result
         }
     }
 
@@ -131,25 +155,29 @@ open class ExpandableOutlineViewHelper(private val expandableOutlineView: ViewGr
     }
 
     private fun getClipPath(ignoreTranslation: Boolean, clipRoundedToBottom: Boolean): Path {
-        with (expandableOutlineView) {
+        with (target) {
             val left: Int
             val top: Int
             val right: Int
             var bottom: Int
             var intersectPath: Path? = null
+            val shouldTranslateContents = XposedHelpers.getBooleanField(this, "mShouldTranslateContents")
+            val mClipTopAmount = XposedHelpers.getIntField(this, "mClipTopAmount")
+            val mClipBottomAmount = XposedHelpers.getIntField(this, "mClipBottomAmount")
+            val mAlwaysRoundBothCorners = false
             if (isCustomOutline()) {
-                val mOutlineRect = NotificationStackHook.fieldOutlineRect.get(this) as Rect
+                val mOutlineRect = XposedHelpers.getObjectField(this, "mOutlineRect") as Rect
                 left = mOutlineRect.left
                 top = mOutlineRect.top
                 right = mOutlineRect.right
                 bottom = mOutlineRect.bottom
             } else {
-                val translation = if (ignoreTranslation) 0 else translationX.toInt()
+                val translation = if (!shouldTranslateContents || ignoreTranslation) 0 else getTranslation().toInt()
                 left = Math.max(translation, 0)
-                top = getClipTopAmount() + mBackgroundTop
+                top = mClipTopAmount + mBackgroundTop
                 right = Math.min(translation, 0) + width
                 bottom = Math.max(getActualHeight(), top)
-                val intersectBottom = Math.max(getActualHeight() - getClipBottomAmount(), top)
+                val intersectBottom = Math.max(getActualHeight() - mClipBottomAmount, top)
                 if (bottom != intersectBottom) {
                     if (clipRoundedToBottom) {
                         bottom = intersectBottom
@@ -163,8 +191,8 @@ open class ExpandableOutlineViewHelper(private val expandableOutlineView: ViewGr
             if (bottom == 0) {
                 return EMPTY_PATH
             }
-            var topRoundness = mCurrentTopRoundness * NotificationStackHook.mCornerRadius
-            var bottomRoundness = mCurrentBottomRoundness * NotificationStackHook.mCornerRadius
+            var topRoundness = if (mAlwaysRoundBothCorners) mOutlineRadius.toFloat() else mCurrentTopRoundness * mOutlineRadius
+            var bottomRoundness = if (mAlwaysRoundBothCorners) mOutlineRadius.toFloat() else mCurrentBottomRoundness * mOutlineRadius
             if (topRoundness + bottomRoundness > bottom.toFloat()) {
                 val overShoot = topRoundness + bottomRoundness - bottom.toFloat()
                 topRoundness -= mCurrentTopRoundness * overShoot / (mCurrentTopRoundness + mCurrentBottomRoundness)
@@ -207,22 +235,39 @@ open class ExpandableOutlineViewHelper(private val expandableOutlineView: ViewGr
     }
 
     private fun getActualHeight(): Int {
-        return NotificationStackHook.methodGetActualHeight.invoke(expandableOutlineView) as Int
+        return NotificationStackHook.methodGetActualHeight.invoke(target) as Int
     }
 
     private fun getClipTopAmount(): Int {
-        return NotificationStackHook.methodGetClipTopAmount.invoke(expandableOutlineView) as Int
+        return XposedHelpers.getIntField(target, "mClipTopAmount")
     }
 
     private fun getClipBottomAmount(): Int {
-        return NotificationStackHook.methodGetClipBottomAmount.invoke(expandableOutlineView) as Int
+        return XposedHelpers.getIntField(target, "mClipBottomAmount")
     }
 
     private fun isCustomOutline(): Boolean {
-        return NotificationStackHook.fieldCustomOutline.getBoolean(expandableOutlineView)
+        return NotificationStackHook.fieldCustomOutline.getBoolean(target)
+    }
+
+    fun getCurrentBackgroundRadiusTop(): Float {
+        return mCurrentTopRoundness * mOutlineRadius
+    }
+
+    fun getCurrentTopRoundness(): Float {
+        return mCurrentTopRoundness
+    }
+
+    fun getCurrentBottomRoundness(): Float {
+        return mCurrentBottomRoundness
+    }
+
+    protected fun getCurrentBackgroundRadiusBottom(): Float {
+        return mCurrentBottomRoundness * mOutlineRadius
     }
 
     fun setTopRoundness(topRoundness: Float, animate: Boolean) {
+        logI("setTopRoundness")
         if (mTopRoundness != topRoundness) {
             mTopRoundness = topRoundness
             setTopRoundnessInternal(topRoundness)
@@ -246,20 +291,86 @@ open class ExpandableOutlineViewHelper(private val expandableOutlineView: ViewGr
         applyRoundness()
     }
 
-    private fun applyRoundness() {
-        with(expandableOutlineView) {
+    protected open fun applyRoundness() {
+        with(target) {
             invalidateOutline()
             invalidate()
         }
     }
 
+    protected open fun setBackgroundTop(backgroundTop: Int) {
+        if (mBackgroundTop != backgroundTop) {
+            mBackgroundTop = backgroundTop
+            target.invalidateOutline()
+        }
+    }
+
+    private fun getTranslation(): Float {
+        return XposedHelpers.callMethod(target, "getTranslation") as Float
+    }
+
     companion object {
-        private const val TAG = "ExpandableOutlineViewHelper"
+
+        private var manager: Manager? = null
+
+        fun hook(classLoader: ClassLoader) {
+            getManager(classLoader)
+        }
+
+        fun getManager(classLoader: ClassLoader): Manager {
+            if (manager == null) {
+                manager = Manager(classLoader)
+            }
+            return manager!!
+        }
+
+        fun get(classLoader: ClassLoader, child: ViewGroup): ExpandableOutlineViewHelper {
+            return getManager(classLoader).get(child)
+        }
+    }
+
+    class Manager(private val classLoader: ClassLoader) {
+
+        private val TAG = "Helper"
+        private val classExpandableOutlineView by lazy { XposedHelpers.findClass("com.android.systemui.statusbar.ExpandableOutlineView", classLoader) }
+
+        init {
+            XposedHelpers.findAndHookConstructor(classExpandableOutlineView,
+                    Context::class.java, AttributeSet::class.java, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    get(param.thisObject as ViewGroup)
+                }
+
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    super.afterHookedMethod(param)
+                    get(param.thisObject as ViewGroup).afterInit()
+                }
+            })
+
+            val applyRoundnessHook = object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    get(param.thisObject as ViewGroup).applyRoundness()
+                }
+            }
+
+            XposedHelpers.findAndHookMethod(classExpandableOutlineView, "setActualHeight",
+                    Int::class.java, Boolean::class.java, applyRoundnessHook)
+
+            XposedHelpers.findAndHookMethod(classExpandableOutlineView, "setClipTopAmount",
+                    Int::class.java, applyRoundnessHook)
+
+            XposedHelpers.findAndHookMethod(classExpandableOutlineView, "setClipBottomAmount",
+                    Int::class.java, applyRoundnessHook)
+
+            XposedHelpers.findAndHookMethod(classExpandableOutlineView, "setOutlineAlpha",
+                    Float::class.java, applyRoundnessHook)
+        }
 
         fun get(child: ViewGroup): ExpandableOutlineViewHelper {
             var helper = XposedHelpers.getAdditionalInstanceField(child, TAG) as ExpandableOutlineViewHelper?
             if (helper == null) {
-                helper = ExpandableOutlineViewHelper(child)
+                helper = ExpandableOutlineViewHelper(classLoader, child)
+                XposedHelpers.setAdditionalInstanceField(child, TAG, helper)
             }
             return helper
         }
