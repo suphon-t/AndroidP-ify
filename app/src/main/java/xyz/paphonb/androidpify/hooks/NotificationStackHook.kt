@@ -36,6 +36,7 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import xyz.paphonb.androidpify.MainHook
 import xyz.paphonb.androidpify.R
+import xyz.paphonb.androidpify.hooks.helpers.ExpandableOutlineViewHelper
 import xyz.paphonb.androidpify.utils.ConfigUtils
 import xyz.paphonb.androidpify.utils.setGoogleSans
 import java.lang.ref.WeakReference
@@ -109,6 +110,17 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
 
         classLoader = lpparam.classLoader
 
+        ExpandableOutlineViewHelper.hook(classLoader)
+//        ActivatableNotificationViewHelper.hook(classLoader)
+//        NotificationBackgroundViewHelper.hook(classLoader)
+
+//        findAndHookConstructor(classExpandableOutlineView, Context::class.java, AttributeSet::class.java,
+//                object : XC_MethodHook() {
+//                    override fun afterHookedMethod(param: MethodHookParam) {
+//                        ExpandableOutlineViewHelper.get(param.thisObject as ViewGroup)
+//                    }
+//                })
+
 //        val updateClippingToTopRoundedCornerHook = object : XC_MethodHook() {
 //            override fun afterHookedMethod(param: MethodHookParam?) {
 //                updateClippingToTopRoundedCorner()
@@ -134,6 +146,13 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                 param.result = drawChild(param.args[0] as Canvas,
                         param.args[1] as View,
                         param.args[2] as Long)
+//
+//                if (!classExpandableOutlineView.isInstance(param.thisObject)) return
+//
+//                param.result = ExpandableOutlineViewHelper.get(param.thisObject as ViewGroup)
+//                        .drawChild(param.args[0] as Canvas,
+//                                param.args[1] as View,
+//                                param.args[2] as Long)
             }
         })
 
@@ -180,8 +199,9 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
 
         findAndHookMethod(classStack, "updateFirstAndLastBackgroundViews",
                 object : XC_MethodHook() {
-                    override fun afterHookedMethod(param: MethodHookParam) {
-                        applyRoundedNess()
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                        updateFirstAndLastBackgroundViews()
+                        param.result = null
                     }
                 })
 
@@ -276,9 +296,55 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
         outPath.close()
     }
 
+    private fun updateFirstAndLastBackgroundViews() {
+        with(stack) {
+            val firstChild = XposedHelpers.callMethod(this, "getFirstChildWithBackground")
+            val lastChild = XposedHelpers.callMethod(this, "getLastChildWithBackground")
+
+            val mFirstVisibleBackgroundChild = XposedHelpers.getObjectField(this, "mFirstVisibleBackgroundChild")
+            val mLastVisibleBackgroundChild = XposedHelpers.getObjectField(this, "mLastVisibleBackgroundChild")
+            val firstChanged = firstChild !== mFirstVisibleBackgroundChild
+            val lastChanged = lastChild !== mLastVisibleBackgroundChild
+
+            val mAnimationsEnabled = XposedHelpers.getBooleanField(this, "mAnimationsEnabled")
+            val mIsExpanded = XposedHelpers.getBooleanField(this, "mIsExpanded")
+            if (mAnimationsEnabled && mIsExpanded) {
+                XposedHelpers.setBooleanField(this, "mAnimateNextBackgroundTop", firstChanged)
+                XposedHelpers.setBooleanField(this, "mAnimateNextBackgroundBottom", lastChanged)
+            } else {
+                XposedHelpers.setBooleanField(this, "mAnimateNextBackgroundTop", false)
+                XposedHelpers.setBooleanField(this, "mAnimateNextBackgroundBottom", false)
+            }
+            if (firstChanged && mFirstVisibleBackgroundChild !== null) {
+                ExpandableOutlineViewHelper.get(classLoader, mFirstVisibleBackgroundChild as ViewGroup).apply {
+                    setTopRoundness(0f, target.isShown)
+                }
+            }
+            if (lastChanged && mLastVisibleBackgroundChild !== null) {
+                ExpandableOutlineViewHelper.get(classLoader, mLastVisibleBackgroundChild as ViewGroup).apply {
+                    setBottomRoundness(0f, target.isShown)
+                }
+            }
+            XposedHelpers.setObjectField(this, "mFirstVisibleBackgroundChild", firstChild)
+            XposedHelpers.setObjectField(this, "mLastVisibleBackgroundChild", lastChild)
+            val mAmbientState = XposedHelpers.getObjectField(this, "mAmbientState")
+            XposedHelpers.callMethod(mAmbientState, "setLastVisibleBackgroundChild", lastChild)
+            applyRoundedNess()
+        }
+    }
+
     private fun applyRoundedNess() {
         with(stack) {
-
+            val mFirstVisibleBackgroundChild = XposedHelpers.getObjectField(this, "mFirstVisibleBackgroundChild") as View?
+            val mLastVisibleBackgroundChild = XposedHelpers.getObjectField(this, "mLastVisibleBackgroundChild") as View?
+            if (mFirstVisibleBackgroundChild !== null && mFirstVisibleBackgroundChild.isShown) {
+                ExpandableOutlineViewHelper.get(classLoader,
+                        mFirstVisibleBackgroundChild as ViewGroup).setTopRoundness(1f, false)
+            }
+            if (mLastVisibleBackgroundChild !== null && mLastVisibleBackgroundChild.isShown) {
+                ExpandableOutlineViewHelper.get(classLoader,
+                        mLastVisibleBackgroundChild as ViewGroup).setBottomRoundness(1f, false)
+            }
         }
     }
 
