@@ -30,4 +30,12 @@
     <dimen name="dashboard_tile_image_margin">18dp</dimen>
     <dimen name="qs_notif_collapsed_space">72dp</dimen>
     <dimen name="signal_indicator_to_icon_frame_spacing">3dp</dimen>
+    <dimen name="opa_dot_diam">10dp</dimen>
+    <dimen name="halo_diameter">18dp</dimen>
+    <dimen name="halo_inner_radius">8dp</dimen>
+    <dimen name="halo_thickness">1dp</dimen>
+    <dimen name="opa_diamond_translation">16dp</dimen>
+    <dimen name="opa_line_x_trans_ry">15dp</dimen>
+    <dimen name="opa_line_y_translation">16dp</dimen>
+    <dimen name="opa_line_x_trans_bg">30dp</dimen>
 </resources>

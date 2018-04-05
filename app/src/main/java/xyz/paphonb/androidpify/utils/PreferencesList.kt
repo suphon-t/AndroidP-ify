@@ -27,6 +27,9 @@ object PreferencesList {
             put(qsVerticalScroll, LEVEL_SYSTEM_UI)
             put(swapQsAndBrightness, LEVEL_SYSTEM_UI)
             put(statusBarHeight, LEVEL_ANDROID)
+            put(changeSettingsTheme, LEVEL_ANDROID)
+            put(newTransitions, LEVEL_ANDROID)
+            put(pixelHomeButton, LEVEL_SYSTEM_UI)
         }
     }
 
@@ -39,6 +42,9 @@ object PreferencesList {
     const val statusBarHeight = "status_bar_height"
 
     const val changeSettingsTheme = "change_settings_theme"
+
+    const val newTransitions = "use_new_transitions"
+    const val pixelHomeButton = "use_pixel_home_button"
 
     const val LEVEL_SYSTEM_UI = 1 shl 0
     const val LEVEL_ANDROID = 1 shl 1

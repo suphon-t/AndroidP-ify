@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <ImageView android:id="@+id/red" android:src="@drawable/ic_sysbar_opa_red" android:importantForAccessibility="no" style="@style/DotStyle" />
+        <ImageView android:id="@+id/blue" android:src="@drawable/ic_sysbar_opa_blue" android:importantForAccessibility="no" style="@style/DotStyle" />
+        <ImageView android:id="@+id/green" android:src="@drawable/ic_sysbar_opa_green" android:importantForAccessibility="no" style="@style/DotStyle" />
+        <ImageView android:id="@+id/yellow" android:src="@drawable/ic_sysbar_opa_yellow" android:importantForAccessibility="no" style="@style/DotStyle" />
+    </RelativeLayout>
+    <ImageView android:layout_gravity="center" android:id="@+id/halo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:importantForAccessibility="no" />
+    <ImageView android:scaleType="fitCenter" android:id="@+id/white_cutout" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" />
+    <ImageView android:scaleType="fitCenter" android:id="@+id/white" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" />
+</merge>

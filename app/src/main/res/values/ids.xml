@@ -7,4 +7,5 @@
     <item name="quick_qs_footer_layout" type="id" />
     <item name="qs_tile_background" type="id" />
     <item name="qs_scroll_layout" type="id" />
+    <item name="home_button" type="id" />
 </resources>
