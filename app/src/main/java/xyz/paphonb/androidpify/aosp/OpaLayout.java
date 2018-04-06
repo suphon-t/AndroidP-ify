@@ -30,7 +30,6 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 import de.robv.android.xposed.XposedHelpers;
-import xyz.paphonb.androidpify.BuildConfig;
 import xyz.paphonb.androidpify.MainHook;
 import xyz.paphonb.androidpify.R;
 import xyz.paphonb.androidpify.utils.Interpolators;
@@ -114,7 +113,6 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         home.setId(R.id.home_button);
         setLayoutParams(new LayoutParams(home.getLayoutParams().width, home.getLayoutParams().height));
         home.getLayoutParams().width = LayoutParams.MATCH_PARENT;
-//        setPadding(home.getPaddingLeft(), home.getPaddingTop(), home.getPaddingRight(), home.getPaddingBottom());
         home.setImageDrawable(null);
         addView(home);
 
@@ -153,7 +151,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         int color = getAttrColor(ctw, singleToneColor);
         GradientDrawable drawable = (GradientDrawable) mResources.getDrawable(R.drawable.halo);
         drawable.mutate();
-        drawable.setColor(BuildConfig.DEBUG ? 0 : color);
+        drawable.setColor(color);
         return drawable;
     }
 
@@ -655,5 +653,25 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
             mGestureLineSet.play(redAnimator).with(homeAnimator).with(OpaUtils.getTranslationObjectAnimatorX(mBlue, OpaUtils.INTERPOLATOR_40_40, -OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_bg), mBlue.getX() + OpaUtils.getDeltaDiamondPositionLeftX(mResources), 350)).with(OpaUtils.getTranslationObjectAnimatorX(mYellow, OpaUtils.INTERPOLATOR_40_40, OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_ry), mYellow.getX() + OpaUtils.getDeltaDiamondPositionBottomX(), 350)).with(OpaUtils.getTranslationObjectAnimatorX(mGreen, OpaUtils.INTERPOLATOR_40_40, OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_bg), mGreen.getX() + OpaUtils.getDeltaDiamondPositionRightX(mResources), 350));
         }
         return mGestureLineSet;
+    }
+
+    @SuppressWarnings("SuspiciousNameCombination")
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int width = getMeasuredWidth();
+        int height = getMeasuredHeight();
+        int haloWidth = mResources.getDimensionPixelSize(R.dimen.halo_diameter);
+        int haloHeight = haloWidth;
+        if (haloWidth % 2 != width % 2) {
+            ++haloWidth;
+        }
+        if (haloHeight % 2 != height % 2) {
+            ++haloHeight;
+        }
+        int widthSpec = MeasureSpec.makeMeasureSpec(haloWidth, MeasureSpec.EXACTLY);
+        int heightSpec = MeasureSpec.makeMeasureSpec(haloHeight, MeasureSpec.EXACTLY);
+        measureChild(mHalo, widthSpec, heightSpec);
     }
 }
