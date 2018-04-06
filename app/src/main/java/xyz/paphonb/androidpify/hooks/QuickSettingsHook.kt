@@ -217,14 +217,15 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val header = param.thisObject as ViewGroup
+                        val headerLayout = header as? RelativeLayout ?: header.getChildAt(1) as? RelativeLayout ?: throw RuntimeException("Unexpected header type")
                         val context = header.context
 
-                        val quickStatusBarIcons = context.resources.getIdentifierNullable(
+                        val quickStatusBarIcons = context.resources.getIdentifier(
                                 "quick_status_bar_icons", "id", MainHook.PACKAGE_SYSTEMUI)
-                        header.findViewById<View?>(quickStatusBarIcons)?.apply {
-                            header.removeViewAt(0)
+                        headerLayout.findViewById<View?>(quickStatusBarIcons)?.apply {
+                            headerLayout.removeViewAt(0)
                         }
-                        val systemIcons = header.getChildAt(0) as ViewGroup
+                        val systemIcons = headerLayout.getChildAt(0) as ViewGroup
                         val battery = systemIcons.findViewById<View>(context.resources.getIdentifier(
                                 "battery", "id", MainHook.PACKAGE_SYSTEMUI))
                         val foreground = Color.WHITE
@@ -236,9 +237,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
 
                         }
 
-                        if (!MainHook.ATLEAST_O_MR1) {
-                            systemIcons.layoutParams.height = qsHeaderSystemIconsAreaHeight
-                        }
+                        systemIcons.layoutParams.height = qsHeaderSystemIconsAreaHeight
 
                         // Move clock to left side
                         val clock = systemIcons.findViewById<View>(context.resources.getIdentifier(
@@ -249,7 +248,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         clock.setPadding(clock.paddingRight, clock.paddingTop,
                                 clock.paddingLeft, clock.paddingBottom)
 
-                        systemIcons.findViewById<View?>(context.resources.getIdentifierNullable(
+                        systemIcons.findViewById<View?>(context.resources.getIdentifier(
                                 "left_clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
                             systemIcons.removeView(this)
                             systemIcons.addView(this, 0)
@@ -261,24 +260,14 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         quickQsStatusIcons.id = R.id.quick_qs_status_icons
 
                         val ownResources = ResourceUtils.getInstance(context)
-                        if (header is RelativeLayout) {
-                            quickQsStatusIcons.layoutParams = RelativeLayout.LayoutParams(
-                                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                                    ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
-                                addRule(RelativeLayout.BELOW, R.id.quick_qs_system_icons)
-                                topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top)
-                                bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
-                            }
-                        } else {
-                            quickQsStatusIcons.layoutParams = FrameLayout.LayoutParams(
-                                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                                    ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
-                                topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top) +
-                                        systemIcons.layoutParams.height
-                                bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
-                            }
+                        quickQsStatusIcons.layoutParams = RelativeLayout.LayoutParams(
+                                RelativeLayout.LayoutParams.MATCH_PARENT,
+                        ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
+                            addRule(RelativeLayout.BELOW, R.id.quick_qs_system_icons)
+                            topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top)
+                            bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
                         }
-                        header.addView(quickQsStatusIcons, 0)
+                        headerLayout.addView(quickQsStatusIcons, 0)
 
                         val statusIcons = StatusIconContainer(context, lpparam.classLoader)
                         statusIcons.layoutParams = LinearLayout.LayoutParams(
