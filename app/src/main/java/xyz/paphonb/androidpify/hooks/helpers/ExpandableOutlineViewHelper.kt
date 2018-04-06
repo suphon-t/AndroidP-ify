@@ -98,10 +98,7 @@ open class ExpandableOutlineViewHelper(classLoader: ClassLoader, target: ViewGro
             }
             var clipped = false
             if (childNeedsClipping(child)) {
-                var clipPath = getCustomClipPath(child)
-                if (clipPath == null) {
-                    clipPath = getClipPath()
-                }
+                val clipPath = getCustomClipPath(child) ?: getClipPath()
                 if (intersectPath != null) {
                     clipPath.op(intersectPath, Path.Op.INTERSECT)
                 }

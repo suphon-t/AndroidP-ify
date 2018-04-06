@@ -77,9 +77,8 @@ object SettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                                 resPackage, PackageManager.MATCH_UNINSTALLED_PACKAGES)
                         if (ai != null) {
                             val resources = context.packageManager.getResourcesForApplication(ai)
-                            val replacement = iconMap[resources.getResourceName(resId)]
-                            if (replacement != null) {
-                                param.result = ownResource.getDrawable(replacement, context.theme)
+                            iconMap[resources.getResourceName(resId)]?.let {
+                                param.result = ownResource.getDrawable(it, context.theme)
                                 return
                             }
                         }

@@ -1,5 +1,6 @@
 package xyz.paphonb.androidpify.hooks
 
+import android.annotation.SuppressLint
 import android.content.res.XResources
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -59,8 +60,9 @@ object HomeButtonHooks : IXposedHookLoadPackage, IXposedHookInitPackageResources
         val classKeyButtonDrawable = XposedHelpers.findClass("com.android.systemui.statusbar.policy.KeyButtonDrawable", lpparam.classLoader)
         XposedHelpers.findAndHookMethod(classButtonDispatcher, "addView",
                 View::class.java, object : XC_MethodHook() {
+            @SuppressLint("ClickableViewAccessibility")
             override fun beforeHookedMethod(param: MethodHookParam) {
-                val view = param.args[0] as View
+                val view = param.args[0] as? OpaLayout ?: return
 
                 val mClickListener = XposedHelpers.getObjectField(param.thisObject, "mClickListener") as View.OnClickListener?
                 val mTouchListener = XposedHelpers.getObjectField(param.thisObject, "mTouchListener") as View.OnTouchListener?
@@ -75,29 +77,13 @@ object HomeButtonHooks : IXposedHookLoadPackage, IXposedHookInitPackageResources
                 view.setOnClickListener(mClickListener)
                 view.setOnTouchListener(mTouchListener)
                 view.setOnLongClickListener(mLongClickListener)
-                if (mLongClickable != null) {
-                    view.isLongClickable = mLongClickable
-                }
-                if (mAlpha != null) {
-                    view.alpha = mAlpha.toFloat()
-                }
-                if (mDarkIntensity != null) {
-                    if (view is ButtonInterface) {
-                        view.setDarkIntensity(mDarkIntensity)
-                    } else {
-                        XposedHelpers.callMethod(view, "setDarkIntensity", arrayOf(Float::class.java), mDarkIntensity)
-                    }
-                }
-                if (mVisibility != null) {
-                    view.visibility = mVisibility
-                }
-                if (mImageDrawable != null) {
-                    setImageDrawable(view, mImageDrawable)
-                }
+                mLongClickable?.let { view.isLongClickable = it }
+                mAlpha?.let { view.alpha = it.toFloat() }
+                mDarkIntensity?.let { setDarkIntensity(view, it) }
+                mVisibility?.let { view.visibility = it }
+                mImageDrawable?.let { setImageDrawable(view, it) }
 
-                if (view is ButtonInterface) {
-                    view.setVertical(mVertical)
-                }
+                view.setVertical(mVertical)
 
                 param.result = null
             }

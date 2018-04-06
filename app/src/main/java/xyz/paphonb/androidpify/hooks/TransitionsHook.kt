@@ -43,10 +43,7 @@ object TransitionsHook : IXposedHookLoadPackage {
                 val context = param.args[0] as Context
                 val anim = param.args[1] as Int
                 val name = context.resources.getResourceEntryName(anim)
-                val override = getOverrideAnimation(name)
-                if (override != null) {
-                    param.result = override
-                }
+                getOverrideAnimation(name)?.let { param.result = it }
             }
         })
     }
