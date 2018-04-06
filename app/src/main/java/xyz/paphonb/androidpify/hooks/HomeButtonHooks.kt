@@ -46,6 +46,7 @@ object HomeButtonHooks : IXposedHookLoadPackage, IXposedHookInitPackageResources
                 String::class.java, ViewGroup::class.java, LayoutInflater::class.java, object : XC_MethodHook() {
             override fun afterHookedMethod(param: MethodHookParam) {
                 val view = param.result as View
+                if (view.javaClass.simpleName == "OpaLayout") return // Already using OpaLayout
                 val context = view.context
                 val homeId = context.resources.getIdentifier("home", "id", MainHook.PACKAGE_SYSTEMUI)
                 if (view.id == homeId) {
