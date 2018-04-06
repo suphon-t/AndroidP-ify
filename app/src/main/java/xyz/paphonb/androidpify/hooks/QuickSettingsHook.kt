@@ -217,7 +217,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val header = param.thisObject as ViewGroup
-                        val headerLayout = header as? RelativeLayout ?: header.getChildAt(1) as? RelativeLayout ?: throw RuntimeException("Unexpected header type")
+                        val headerLayout = header as? RelativeLayout ?: header.getChildAt(1) as? RelativeLayout ?: header as FrameLayout
                         val context = header.context
 
                         val quickStatusBarIcons = context.resources.getIdentifier(
@@ -260,12 +260,22 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         quickQsStatusIcons.id = R.id.quick_qs_status_icons
 
                         val ownResources = ResourceUtils.getInstance(context)
-                        quickQsStatusIcons.layoutParams = RelativeLayout.LayoutParams(
-                                RelativeLayout.LayoutParams.MATCH_PARENT,
-                        ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
-                            addRule(RelativeLayout.BELOW, R.id.quick_qs_system_icons)
-                            topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top)
-                            bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
+                        if (headerLayout is RelativeLayout) {
+                            quickQsStatusIcons.layoutParams = RelativeLayout.LayoutParams(
+                                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                                    ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
+                                addRule(RelativeLayout.BELOW, R.id.quick_qs_system_icons)
+                                topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top)
+                                bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
+                            }
+                        } else {
+                            quickQsStatusIcons.layoutParams = FrameLayout.LayoutParams(
+                                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                                    ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
+                                topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top) +
+                                        systemIcons.layoutParams.height
+                                bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
+                            }
                         }
                         headerLayout.addView(quickQsStatusIcons, 0)
 
