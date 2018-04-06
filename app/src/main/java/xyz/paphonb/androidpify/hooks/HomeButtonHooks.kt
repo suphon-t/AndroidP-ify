@@ -103,42 +103,58 @@ object HomeButtonHooks : IXposedHookLoadPackage, IXposedHookInitPackageResources
             }
         })
 
-        XposedHelpers.findAndHookMethod(classButtonDispatcher, "setImageDrawable",
-                classKeyButtonDrawable, object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
-                val drawable = param.args[0] as Drawable?
-                XposedHelpers.setObjectField(param.thisObject, "mImageDrawable", drawable)
-                getViews(param).forEach { setImageDrawable(it, drawable) }
-                param.result = null
-            }
-        })
+        try {
+            XposedHelpers.findAndHookMethod(classButtonDispatcher, "setImageDrawable",
+                    classKeyButtonDrawable, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    val drawable = param.args[0] as Drawable?
+                    XposedHelpers.setObjectField(param.thisObject, "mImageDrawable", drawable)
+                    getViews(param).forEach { setImageDrawable(it, drawable) }
+                    param.result = null
+                }
+            })
+        } catch (t: Throwable) {
+            MainHook.logE("HomeButtonHooks", "can't hook setImageDrawable", t)
+        }
 
-        XposedHelpers.findAndHookMethod(classButtonDispatcher, "abortCurrentGesture", object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
-                getViews(param).forEach { abortCurrentGesture(it) }
-                param.result = null
-            }
-        })
+        try {
+            XposedHelpers.findAndHookMethod(classButtonDispatcher, "abortCurrentGesture", object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    getViews(param).forEach { abortCurrentGesture(it) }
+                    param.result = null
+                }
+            })
+        } catch (t: Throwable) {
+            MainHook.logE("HomeButtonHooks", "can't hook abortCurrentGesture", t)
+        }
 
-        XposedHelpers.findAndHookMethod(classButtonDispatcher, "setDarkIntensity",
-                Float::class.java, object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
-                val intensity = param.args[0] as Float
-                XposedHelpers.setObjectField(param.thisObject, "mDarkIntensity", java.lang.Float.valueOf(intensity))
-                getViews(param).forEach { setDarkIntensity(it, intensity) }
-                param.result = null
-            }
-        })
+        try {
+            XposedHelpers.findAndHookMethod(classButtonDispatcher, "setDarkIntensity",
+                    Float::class.java, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    val intensity = param.args[0] as Float
+                    XposedHelpers.setObjectField(param.thisObject, "mDarkIntensity", java.lang.Float.valueOf(intensity))
+                    getViews(param).forEach { setDarkIntensity(it, intensity) }
+                    param.result = null
+                }
+            })
+        } catch (t: Throwable) {
+            MainHook.logE("HomeButtonHooks", "can't hook setDarkIntensity", t)
+        }
 
-        XposedHelpers.findAndHookMethod(classButtonDispatcher, "setVertical",
-                Boolean::class.java, object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
-                val vertical = param.args[0] as Boolean
-                XposedHelpers.setObjectField(param.thisObject, "mVertical", java.lang.Boolean.valueOf(vertical))
-                getViews(param).forEach { setVertical(it, vertical) }
-                param.result = null
-            }
-        })
+        try {
+            XposedHelpers.findAndHookMethod(classButtonDispatcher, "setVertical",
+                    Boolean::class.java, object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    val vertical = param.args[0] as Boolean
+                    XposedHelpers.setObjectField(param.thisObject, "mVertical", java.lang.Boolean.valueOf(vertical))
+                    getViews(param).forEach { setVertical(it, vertical) }
+                    param.result = null
+                }
+            })
+        } catch (t: Throwable) {
+            MainHook.logE("HomeButtonHooks", "can't hook setVertical", t)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
