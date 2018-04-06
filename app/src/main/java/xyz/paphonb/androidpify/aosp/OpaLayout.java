@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 import de.robv.android.xposed.XposedHelpers;
+import xyz.paphonb.androidpify.BuildConfig;
 import xyz.paphonb.androidpify.MainHook;
 import xyz.paphonb.androidpify.R;
 import xyz.paphonb.androidpify.utils.Interpolators;
@@ -152,7 +153,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         int color = getAttrColor(ctw, singleToneColor);
         GradientDrawable drawable = (GradientDrawable) mResources.getDrawable(R.drawable.halo);
         drawable.mutate();
-        drawable.setColor(color);
+        drawable.setColor(BuildConfig.DEBUG ? 0 : color);
         return drawable;
     }
 
@@ -175,7 +176,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         mHome.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                return l.onLongClick(mHome);
+                return l != null && l.onLongClick(mHome);
             }
         });
     }
