@@ -495,7 +495,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
     private void endCurrentAnimation() {
         if (!mCurrentAnimators.isEmpty()) {
             for (int i = mCurrentAnimators.size() - 1; i >= 0; i--) {
-                Animator a = (Animator) mCurrentAnimators.valueAt(i);
+                Animator a = mCurrentAnimators.valueAt(i);
                 a.removeAllListeners();
                 a.end();
             }
@@ -508,7 +508,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         long longestDuration = Long.MIN_VALUE;
         Animator longestAnim = null;
         for (int i = animators.size() - 1; i >= 0; i--) {
-            Animator a = (Animator) animators.valueAt(i);
+            Animator a = animators.valueAt(i);
             if (a.getTotalDuration() > longestDuration) {
                 longestAnim = a;
                 longestDuration = a.getTotalDuration();
@@ -520,14 +520,14 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
     private void setDotsVisible() {
         int size = mAnimatedViews.size();
         for (int i = 0; i < size; i++) {
-            ((View) mAnimatedViews.get(i)).setAlpha(1.0f);
+            mAnimatedViews.get(i).setAlpha(1.0f);
         }
     }
 
     private void skipToStartingValue() {
         int size = mAnimatedViews.size();
         for (int i = 0; i < size; i++) {
-            View v = (View) mAnimatedViews.get(i);
+            View v = mAnimatedViews.get(i);
             v.setScaleY(1.0f);
             v.setScaleX(1.0f);
             v.setTranslationY(0.0f);
@@ -673,5 +673,11 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         int widthSpec = MeasureSpec.makeMeasureSpec(haloWidth, MeasureSpec.EXACTLY);
         int heightSpec = MeasureSpec.makeMeasureSpec(haloHeight, MeasureSpec.EXACTLY);
         measureChild(mHalo, widthSpec, heightSpec);
+    }
+
+    @Override
+    public void setLongClickable(boolean longClickable) {
+        super.setLongClickable(longClickable);
+        mHome.setLongClickable(longClickable);
     }
 }
