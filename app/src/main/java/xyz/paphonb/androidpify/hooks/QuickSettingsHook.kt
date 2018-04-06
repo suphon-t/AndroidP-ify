@@ -421,6 +421,15 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
         findAndHookMethod(footerClass, "updateAnimator", Int::class.java, clearAlarmShowing)
         findAndHookMethod(footerClass, "updateAlarmVisibilities", clearAlarmShowing)
 
+        findAndHookMethod(footerClass, "updateVisibilities",
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        val mSettingsButton = XposedHelpers.getObjectField(param.thisObject, "mSettingsButton") as View
+                        val mExpanded = XposedHelpers.getBooleanField(param.thisObject, "mExpanded")
+                        mSettingsButton.visibility = if (mExpanded) View.VISIBLE else View.GONE
+                    }
+                })
+
         findAndHookMethod(footerClass, "onFinishInflate",
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
