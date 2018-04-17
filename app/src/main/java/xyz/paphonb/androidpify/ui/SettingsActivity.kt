@@ -22,6 +22,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
@@ -181,7 +182,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         }
     }
 
-    class SubSettingsFragment : BaseFragment() {
+    class SubSettingsFragment : BaseFragment(), Preference.OnPreferenceClickListener {
 
         private val title by lazy { arguments!!.getString(TITLE) }
         private val contents by lazy { arguments!!.getInt(CONTENT_RES_ID) }
@@ -189,6 +190,27 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             super.onCreatePreferences(savedInstanceState, rootKey)
             addPreferencesFromResource(contents)
+            if (contents == R.xml.preferences_settings) {
+                preferenceScreen.findPreference("use_pixel_home_button").onPreferenceClickListener = this
+            }
+        }
+
+        override fun onPreferenceClick(preference: Preference): Boolean {
+            if ("use_pixel_home_button" == preference.key) {
+                val packageManager = context!!.packageManager
+                packageManager.getLaunchIntentForPackage("xyz.paphonb.pixelnavbar")?.run {
+                    startActivity(this)
+                } ?: try {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=xyz.paphonb.pixelnavbar")))
+                } catch (t: Throwable) {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://forum.xda-developers.com/xposed/modules/xposed-pixel-navigation-bar-pixel-t3502987")))
+                    } catch (t2: Throwable) {
+                        Toast.makeText(context, R.string.please_install_pixel_navbar, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            return true
         }
 
         override fun onResume() {

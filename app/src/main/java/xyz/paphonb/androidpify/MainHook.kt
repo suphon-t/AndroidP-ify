@@ -46,7 +46,6 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
         NotificationStackHook.handleLoadPackage(lpparam)
         QuickSettingsHook.handleLoadPackage(lpparam)
         SettingsHook.handleLoadPackage(lpparam)
-        HomeButtonHooks.handleLoadPackage(lpparam)
 
         if (lpparam.packageName == PACKAGE_OWN) {
             XposedHelpers.findAndHookMethod(SETTINGS_OWN, lpparam.classLoader,
@@ -63,7 +62,6 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
         QuickSettingsHook.handleInitPackageResources(resparam)
         SettingsHook.handleInitPackageResources(resparam)
         KeyguardHook.handleInitPackageResources(resparam)
-        HomeButtonHooks.handleInitPackageResources(resparam)
     }
 
     val ATLEAST_O_MR1 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1
