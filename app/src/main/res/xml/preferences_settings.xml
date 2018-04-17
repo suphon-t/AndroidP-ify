@@ -12,4 +12,9 @@
         android:key="use_new_transitions"
         android:summary="@string/use_new_transitions_summary"
         android:title="@string/use_new_transitions_title"/>
+
+    <Preference
+        android:key="use_pixel_home_button"
+        android:summary="@string/use_pixel_home_button_summary"
+        android:title="@string/use_pixel_home_button_title"/>
 </PreferenceScreen>
