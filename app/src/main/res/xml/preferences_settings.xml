@@ -6,4 +6,10 @@
         android:key="change_settings_theme"
         android:summary="@string/change_settings_theme_summary"
         android:title="@string/change_settings_theme_title"/>
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="use_new_transitions"
+        android:summary="@string/use_new_transitions_summary"
+        android:title="@string/use_new_transitions_title"/>
 </PreferenceScreen>

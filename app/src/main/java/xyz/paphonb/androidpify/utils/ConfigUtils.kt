@@ -26,6 +26,7 @@ object ConfigUtils {
     val prefs by lazy { XSharedPreferences(File("/data/user_de/0/${MainHook.PACKAGE_OWN}/shared_prefs/${MainHook.PACKAGE_OWN}_preferences.xml")).apply { makeWorldReadable() } }
     val notifications get() = notificationsInternal!!
     val settings get() = settingsInternal!!
+    val misc get() = miscInternal!!
 
     fun reload() {
         prefs.reload()
@@ -35,10 +36,12 @@ object ConfigUtils {
     private fun loadConfig() {
         notificationsInternal = NotificationConfig(prefs)
         settingsInternal = SettingsConfig(prefs)
+        miscInternal = MiscConfig(prefs)
     }
 
     private var notificationsInternal: NotificationConfig? = null
     private var settingsInternal: SettingsConfig? = null
+    private var miscInternal: MiscConfig? = null
 
     class NotificationConfig(prefs: SharedPreferences) {
         val enableLeftClock = prefs.getBoolean(PreferencesList.enableLeftClock, true)
@@ -52,5 +55,9 @@ object ConfigUtils {
 
     class SettingsConfig(prefs: SharedPreferences) {
         val changeSettingsTheme = prefs.getBoolean(PreferencesList.changeSettingsTheme, true)
+    }
+
+    class MiscConfig(prefs: SharedPreferences) {
+        val newTransitions = prefs.getBoolean(PreferencesList.newTransitions, true)
     }
 }

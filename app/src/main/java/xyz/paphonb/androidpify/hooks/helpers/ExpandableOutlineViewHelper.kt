@@ -28,7 +28,6 @@ import android.view.ViewOutlineProvider
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import xyz.paphonb.androidpify.hooks.NotificationStackHook
-import xyz.paphonb.androidpify.utils.logI
 
 
 open class ExpandableOutlineViewHelper(classLoader: ClassLoader, target: ViewGroup)
@@ -99,10 +98,7 @@ open class ExpandableOutlineViewHelper(classLoader: ClassLoader, target: ViewGro
             }
             var clipped = false
             if (childNeedsClipping(child)) {
-                var clipPath = getCustomClipPath(child)
-                if (clipPath == null) {
-                    clipPath = getClipPath()
-                }
+                val clipPath = getCustomClipPath(child) ?: getClipPath()
                 if (intersectPath != null) {
                     clipPath.op(intersectPath, Path.Op.INTERSECT)
                 }
@@ -267,7 +263,6 @@ open class ExpandableOutlineViewHelper(classLoader: ClassLoader, target: ViewGro
     }
 
     fun setTopRoundness(topRoundness: Float, animate: Boolean) {
-        logI("setTopRoundness")
         if (mTopRoundness != topRoundness) {
             mTopRoundness = topRoundness
             setTopRoundnessInternal(topRoundness)
