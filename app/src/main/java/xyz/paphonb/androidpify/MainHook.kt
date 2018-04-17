@@ -78,8 +78,7 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
 
     fun logE(tag: String, msg: String, t: Throwable? = null) {
         XposedBridge.log(String.format(LOG_FORMAT, "[ERROR]", tag, msg))
-        if (t != null)
-            XposedBridge.log(t)
+        t?.let { XposedBridge.log(it) }
     }
 
     fun logW(tag: String, msg: String) {

@@ -22,8 +22,10 @@
     <string name="change_pull_down_summary">Use new style from Android P</string>
     <string name="pref_settings_title">Settings</string>
     <string name="pref_settings_summary">Customize your settings app</string>
+    <string name="pref_misc_title">Miscellaneous</string>
+    <string name="pref_misc_summary">Other tweaks</string>
     <string name="change_settings_theme_title">Style settings</string>
-    <string name="change_settings_theme_summary">Use new style from Android P</string>
+    <string name="change_settings_theme_summary">Use new settings style from Android P</string>
     <string name="about_title">About</string>
     <string name="about_pref_summary">Get more info</string>
     <string name="about_share_title">Share</string>
@@ -39,4 +41,6 @@
     <string name="qs_vertical_scroll_summary">Replace paginated qs with vertical scrollable grid (very buggy)</string>
     <string name="status_bar_alarm">Alarm</string>
     <string name="swap_qs_and_brightness_title">Swap quick settings and brightness slider</string>
+    <string name="use_new_transitions_title">Use new transitions</string>
+    <string name="use_new_transitions_summary">For app switching</string>
 </resources>

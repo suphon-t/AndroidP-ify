@@ -25,8 +25,8 @@
 
     <!--suppress AndroidElementNotAllowed -->
     <xyz.paphonb.androidpify.ui.SubPreference
-        android:title="@string/pref_settings_title"
-        android:summary="@string/pref_settings_summary"
+        android:title="@string/pref_misc_title"
+        android:summary="@string/pref_misc_summary"
         android:icon="@drawable/ic_settings"
         app:content="@xml/preferences_settings"
         android:layout="@layout/sub_preference" />

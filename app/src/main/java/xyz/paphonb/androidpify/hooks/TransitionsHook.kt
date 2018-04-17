@@ -26,12 +26,14 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 import xyz.paphonb.androidpify.ClipRectAnimation
 import xyz.paphonb.androidpify.MainHook
 import xyz.paphonb.androidpify.PathParser
+import xyz.paphonb.androidpify.utils.ConfigUtils
 
 object TransitionsHook : IXposedHookLoadPackage {
 
     @SuppressLint("PrivateApi")
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (lpparam.packageName != MainHook.PACKAGE_ANDROID) return
+        if (!ConfigUtils.misc.newTransitions) return
 
         XposedHelpers.findAndHookMethod(
                 AnimationUtils::class.java, "loadAnimation",
@@ -41,10 +43,7 @@ object TransitionsHook : IXposedHookLoadPackage {
                 val context = param.args[0] as Context
                 val anim = param.args[1] as Int
                 val name = context.resources.getResourceEntryName(anim)
-                val override = getOverrideAnimation(name)
-                if (override != null) {
-                    param.result = override
-                }
+                getOverrideAnimation(name)?.let { param.result = it }
             }
         })
     }
