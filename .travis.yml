@@ -19,8 +19,8 @@ android:
   - android-27
   - extra-google-m2repository
 before_install:
-- openssl aes-256-cbc -K $encrypted_739f19d9f917_key -iv $encrypted_739f19d9f917_iv
-  -in pify.jks.enc -out pify.jks -d
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then openssl aes-256-cbc -K $encrypted_739f19d9f917_key -iv $encrypted_739f19d9f917_iv
+  -in pify.jks.enc -out pify.jks -d; fi
 - yes | sdkmanager "platforms;android-27"
 - chmod a+x ./scripts/deploy-*.sh
 - chmod a+x ./scripts/changelog.sh
@@ -28,7 +28,8 @@ before_install:
 before_script:
 - bash scripts/changelog.sh > changelog.txt
 script:
-- bash ./gradlew app:assembleRelease
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./gradlew app:assembleRelease; fi
+- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./gradlew app:assembleDebug; fi
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
