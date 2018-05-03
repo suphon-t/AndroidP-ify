@@ -11,7 +11,7 @@
     <string name="module_not_activated_summary">請在 Xposed Installer 中啟用此模組</string>
     <string name="xposed_installer_not_found">請先安裝 Xposed Installer</string>
     <string name="preferences_not_readable_title">無法讀取設定！</string>
-    <string name="preferences_not_readable_summary">請不要點我</string>
+    <string name="preferences_not_readable_summary">霸脫不要點我</string>
     <string name="settings_changed">設定已變更</string>
     <string name="settings_changed_description">重新啟動以套用變更</string>
     <string name="notif_channel_general_title">通用</string>
@@ -33,10 +33,10 @@
     <string name="about_author_name">paphonb</string>
     <string name="about_author_github">在 GitHub 上查看</string>
     <string name="share_with">分享 \"%s\" 至</string>
-    <string name="share_text">Check out \"%s\"\nhttps://github.com/paphonb/AndroidP-ify</string>
+    <string name="share_text">快來查看 \"%s\"\nhttps://github.com/paphonb/AndroidP-ify</string>
     <string name="version_text">版本 %s</string>
     <string name="circle_tile_background_title">圓形標題背景</string>
-    <string name="circle_tile_background_summary">S在快速設定磁磚下顯示圓形背景</string>
+    <string name="circle_tile_background_summary">在快速設定磁磚下顯示圓形背景</string>
     <string name="qs_vertical_scroll_title">縱向快速設定</string>
     <string name="qs_vertical_scroll_summary">使用縱向滾動替換分頁式快速設定（測試中）</string>
     <string name="status_bar_alarm">鬧鐘</string>
@@ -44,6 +44,6 @@
     <string name="use_new_transitions_title">使用新轉場動畫</string>
     <string name="use_new_transitions_summary">切換應用程式時顯示</string>
     <string name="use_pixel_home_button_title">Pixel 首頁按鈕</string>
-    <string name="use_pixel_home_button_summary">啟用動畫版 Pixel 風格 Home 按鈕/string>
+    <string name="use_pixel_home_button_summary">啟用動態 Pixel 風格主頁鍵按鈕/string>
     <string name="please_install_pixel_navbar">請從 Play 商店安裝 Pixel Navigation Bar</string>
 </resources>
