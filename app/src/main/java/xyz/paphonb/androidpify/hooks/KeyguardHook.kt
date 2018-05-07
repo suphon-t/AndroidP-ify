@@ -33,7 +33,7 @@ object KeyguardHook : IXposedHookInitPackageResources {
                     override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
                         val clockId = liparam.view.context.resources
                                 .getIdentifier("clock_view", "id", MainHook.PACKAGE_SYSTEMUI)
-                        liparam.view.findViewById<TextView>(clockId).setGoogleSans()
+                        liparam.view.findViewById<TextView>(clockId).setGoogleSans("Light")
 
                         val dateId = liparam.view.context.resources
                                 .getIdentifier("date_view", "id", MainHook.PACKAGE_SYSTEMUI)
