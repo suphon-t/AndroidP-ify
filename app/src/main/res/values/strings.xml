@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Android P-ify</string>
     <string name="xposed_description">Use features introduced in Android P on your O+ Device!</string>
     <string name="pref_status_bar_title">Status bar</string>
     <string name="pref_status_bar_summary">Customize your status bar</string>
@@ -11,7 +10,6 @@
     <string name="module_not_activated_summary">Please activate the module in Xposed Installer</string>
     <string name="xposed_installer_not_found">Xposed Installer is not installed. Please install it first.</string>
     <string name="preferences_not_readable_title">Preferences not readable!</string>
-    <string name="preferences_not_readable_summary">Pls don\'t click me</string>
     <string name="settings_changed">Settings changed</string>
     <string name="settings_changed_description">Restart to apply changes</string>
     <string name="notif_channel_general_title">General</string>
@@ -30,7 +28,6 @@
     <string name="about_pref_summary">Get more info</string>
     <string name="about_share_title">Share</string>
     <string name="about_author_title">Author</string>
-    <string name="about_author_name">paphonb</string>
     <string name="about_author_github">View on GitHub</string>
     <string name="share_with">Share \"%s\" with</string>
     <string name="share_text">Check out \"%s\"\nhttps://github.com/paphonb/AndroidP-ify</string>

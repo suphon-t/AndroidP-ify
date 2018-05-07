@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Android P-ify</string>
     <string name="xposed_description">Android Oreo Cihazınızda Xposed İle Android P\'de Tanıtılan Özellikleri Kullanın</string>
     <string name="pref_status_bar_title">Durum Çubuğu</string>
     <string name="pref_status_bar_summary">Durum Çubuğunu Özelleştir</string>
@@ -11,7 +10,6 @@
     <string name="module_not_activated_summary">Lütfen Modülü Xposed İçinde Etkinleştirin</string>
     <string name="xposed_installer_not_found">Xposed Kurulu Değil Lütfen Önce Xposed Yükleyiniz</string>
     <string name="preferences_not_readable_title">Tercihler Okunamaz!</string>
-    <string name="preferences_not_readable_summary">Lütfen Basmayın</string>
     <string name="settings_changed">Ayarlar Değişti</string>
     <string name="settings_changed_description">Değişiklikleri Uygulamak İçin Yeniden Başlat</string>
     <string name="notif_channel_general_title">Genel</string>
@@ -30,7 +28,6 @@
     <string name="about_pref_summary">Daha Fazla Bilgi Edinin</string>
     <string name="about_share_title">Paylaş</string>
     <string name="about_author_title">Geliştirici</string>
-    <string name="about_author_name">paphonb</string>
     <string name="about_author_github">GitHub\'da Görüntüle</string>
     <string name="share_with">Paylaş \"%s\" ile</string>
     <string name="share_text">Sende Bu Hissi Yaşa \"%s\"\nhttps://github.com/paphonb/AndroidP-ify</string>
