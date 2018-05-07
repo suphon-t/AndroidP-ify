@@ -1,5 +1,4 @@
 <resources>
-	<string name="app_name">Android P-ify</string>
 	<string name="xposed_description">在Android O+设备上使用Android P中的部分新特性！</string>
 	<string name="pref_status_bar_title">状态栏</string>
 	<string name="pref_status_bar_summary">自定义状态栏</string>
@@ -11,7 +10,6 @@
 	<string name="module_not_activated_summary">请在Xposed Installer中启用该模块</string>
 	<string name="xposed_installer_not_found">Xposed Installer未安装，请先安装Xposed Installer。</string>
 	<string name="preferences_not_readable_title">配置文件不可读！</string>
-	<string name="preferences_not_readable_summary">请不要点击</string>
 	<string name="settings_changed">设置已更改</string>
 	<string name="settings_changed_description">重启以应用设置</string>
 	<string name="notif_channel_general_title">通用</string>
@@ -30,7 +28,6 @@
 	<string name="about_pref_summary">获取更多信息</string>
 	<string name="about_share_title">分享</string>
 	<string name="about_author_title">作者</string>
-	<string name="about_author_name">paphonb</string>
 	<string name="about_author_github">查看GitHub仓库</string>
 	<string name="share_with">分享 %s 到</string>
 	<string name="share_text">Check out \"%s\"\nhttps://github.com/paphonb/AndroidP-ify</string>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xposed_description">Utilizza le funzionalità introdotte in Android P sul tuo dispositivo O +!</string>
+    <string name="pref_status_bar_title">Barra di stato</string>
+    <string name="pref_status_bar_summary">Personalizza la tua barra di stato</string>
+    <string name="enable_left_clock_title">Orologio a sinistra</string>
+    <string name="enable_left_clock_summary">Sposta l\'orologio della barra di stato a sinistra</string>
+    <string name="force_dark_theme_title">Forza tema scuro</string>
+    <string name="force_dark_theme_summary">Usa sempre il tema scuro sul pannello delle notifiche (per 8.1)</string>
+    <string name="module_not_activated_title">Modulo non attivato!</string>
+    <string name="module_not_activated_summary">Si prega di attivare il modulo in Xposed Installer</string>
+    <string name="xposed_installer_not_found">Xposed Installer non è installato. Si prega di installarlo prima.</string>
+    <string name="preferences_not_readable_title">Preferenze non leggibili!</string>
+    <string name="settings_changed">Impostazioni modificate</string>
+    <string name="settings_changed_description">Riavvia per applicare le modifiche</string>
+    <string name="notif_channel_general_title">Generale</string>
+    <string name="restart_systemui">Riavvia UI di sistema</string>
+    <string name="restart_broadcast_sent">Riavviando UI di sistema</string>
+    <string name="restart_android">Riavvia Android</string>
+    <string name="change_pull_down_title">Stile notifiche e impostazioni rapide</string>
+    <string name="change_pull_down_summary">Usa il nuovo stile di Android P</string>
+    <string name="pref_settings_title">Impostazioni</string>
+    <string name="pref_settings_summary">Personalizza la tua app per le impostazioni</string>
+    <string name="pref_misc_title">Varie</string>
+    <string name="pref_misc_summary">Altre modifiche</string>
+    <string name="change_settings_theme_title">Stile impostazioni</string>
+    <string name="change_settings_theme_summary">Usa il nuovo stile di Android P</string>
+    <string name="about_title">Informazioni</string>
+    <string name="about_pref_summary">Ottieni maggiori informazioni</string>
+    <string name="about_share_title">Condividi</string>
+    <string name="about_author_title">Autore</string>
+    <string name="about_author_github">Visualizza su GitHub</string>
+    <string name="share_with">Condividi \"%s\" con</string>
+    <string name="share_text">Controlla su \"%s\"\nhttps://github.com/paphonb/AndroidP-ify</string>
+    <string name="version_text">Versione %s</string>
+    <string name="circle_tile_background_title">Sfondo tile cerchiato</string>
+    <string name="circle_tile_background_summary">Mostra uno sfondo cerchiato sotto i tile delle impostazioni rapide</string>
+    <string name="qs_vertical_scroll_title">Scorrimento verticale</string>
+    <string name="qs_vertical_scroll_summary">Sostituisci le impostazioni rapide impaginate con la griglia scorrevole verticale (molto bacato)</string>
+    <string name="status_bar_alarm">Sveglia</string>
+    <string name="swap_qs_and_brightness_title">Cursore luminosità in basso</string>
+    <string name="use_new_transitions_title">Usa nuove transizioni</string>
+    <string name="use_new_transitions_summary">Per cambiare app</string>
+    <string name="use_pixel_home_button_title">Tasto home Pixel</string>
+    <string name="use_pixel_home_button_summary">Abilita il pulsante Home in stile Pixel con animazioni</string>
+    <string name="please_install_pixel_navbar">Installa la barra di navigazione Pixel dal Google Play</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android P-ify</string>
+    <string name="preferences_not_readable_summary">Pls don\'t click me</string>
+    <string name="about_author_name">paphonb</string>
+</resources>
