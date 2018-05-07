@@ -92,5 +92,6 @@ fun Any.logE(msg: String, throwable: Throwable? = null) {
 }
 
 fun TextView.setGoogleSans(style: String = "Regular") {
+    if (!ConfigUtils.misc.googleSans) return
     typeface = Typeface.createFromAsset(ResourceUtils.getInstance(context).assets, "fonts/GoogleSans-$style.ttf")
 }

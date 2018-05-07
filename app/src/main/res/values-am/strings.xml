@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Android P-ify</string>
     <string name="xposed_description">Օգտագործի՜ր Android P-ում ներկայացված հնարավորությունները քո Android O սարքի մեջ։</string>
     <string name="pref_status_bar_title">Վիճակի վահանակ</string>
     <string name="pref_status_bar_summary">Ոճավորր՜ր վիճակի վահանակդ</string>
@@ -11,7 +10,6 @@
     <string name="module_not_activated_summary">Խնդրում ենք ակտիվացնել մոդուլը Xposed Installer-ում։</string>
     <string name="xposed_installer_not_found">Xposed Installer-ը տեղադրված չէ։ Խնդրում ենք տեղադրել այն։</string>
     <string name="preferences_not_readable_title">Կարգավորումները հասկանալի չեն։</string>
-    <string name="preferences_not_readable_summary">Չսեղմել այստեղ։</string>
     <string name="settings_changed">Կարգավորումները փոփոխված են։</string>
     <string name="settings_changed_description">Վերագործարկել փոփոխությումմերը պահպանելու համար</string>
     <string name="notif_channel_general_title">Գլխավոր</string>
@@ -30,7 +28,6 @@
     <string name="about_pref_summary">Ստանալ ավելի շատ տեղեկություն</string>
     <string name="about_share_title">Կիսվել</string>
     <string name="about_author_title">Հեղինակ</string>
-    <string name="about_author_name">paphonb</string>
     <string name="about_author_github">Դիտել GitHub-ում</string>
     <string name="share_with">Կիսվել \"%s\"-ով</string>
     <string name="share_text">Փորփի՜ր \"%s\"-ը\nhttps://github.com/paphonb/AndroidP-ify</string>
