@@ -46,4 +46,6 @@
     <string name="use_pixel_home_button_title">Pixel home button</string>
     <string name="use_pixel_home_button_summary">Enable Pixel style home button with animations</string>
     <string name="please_install_pixel_navbar">Please install Pixel Navigation Bar from Google Play</string>
+    <string name="use_google_sans">Google Sans</string>
+    <string name="use_google_sans_summary">Use Google Sans font in various places in System UI</string>
 </resources>
