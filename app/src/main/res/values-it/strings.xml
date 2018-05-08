@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="xposed_description">Utilizza le funzionalità introdotte in Android P sul tuo dispositivo O +!</string>
+    <string name="xposed_description">Utilizza le funzionalità introdotte in Android P sul tuo dispositivo O!</string>
     <string name="pref_status_bar_title">Barra di stato</string>
     <string name="pref_status_bar_summary">Personalizza la tua barra di stato</string>
     <string name="enable_left_clock_title">Orologio a sinistra</string>
@@ -40,8 +40,10 @@
     <string name="status_bar_alarm">Sveglia</string>
     <string name="swap_qs_and_brightness_title">Cursore luminosità in basso</string>
     <string name="use_new_transitions_title">Usa nuove transizioni</string>
-    <string name="use_new_transitions_summary">Per cambiare app</string>
+    <string name="use_new_transitions_summary">Usa le nuove animazioni di transizione per le app</string>
     <string name="use_pixel_home_button_title">Tasto home Pixel</string>
     <string name="use_pixel_home_button_summary">Abilita il pulsante Home in stile Pixel con animazioni</string>
     <string name="please_install_pixel_navbar">Installa la barra di navigazione Pixel dal Google Play</string>
+    <string name="use_google_sans">Google Sans</string>
+    <string name="use_google_sans_summary">Utilizza il carattere di Google Sans in vari punti della UI di sistema</string>
 </resources>
