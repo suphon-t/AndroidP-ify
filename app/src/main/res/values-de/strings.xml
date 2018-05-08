@@ -37,10 +37,12 @@
     <string name="qs_vertical_scroll_title">Vertikales scrollen</string>
     <string name="qs_vertical_scroll_summary">Ersetze horizontale Ansicht mit vertikaler Liste (sehr fehleranfällig)</string>
     <string name="status_bar_alarm">Alarm</string>
-    <string name="swap_qs_and_brightness_title">Vertausche Schnelleinstellungen mit dem Helligkeitsregler</string>
+    <string name="swap_qs_and_brightness_title">Vertausche Helligkeitsregler und Schnelleinstellungen</string>
     <string name="use_new_transitions_title">Nutze neue Übergangsanimationen</string>
     <string name="use_new_transitions_summary">Für App-Wechsel</string>
     <string name="use_pixel_home_button_title">Pixel Home-Button</string>
     <string name="use_pixel_home_button_summary">Aktiviere den Home-Button im Pixel-Stil mit Animationen.</string>
     <string name="please_install_pixel_navbar">Bitte installiere die Pixel-Navigationsleiste von Google Play.</string>
+    <string name="use_google_sans">Google Sans</string>
+    <string name="use_google_sans_summary">Verwende die Google Sans-Schriftart an verschiedenen Stellen im System-UI</string>
 </resources>
