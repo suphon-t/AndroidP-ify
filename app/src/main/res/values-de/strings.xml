@@ -43,6 +43,6 @@
     <string name="use_pixel_home_button_title">Pixel Home-Button</string>
     <string name="use_pixel_home_button_summary">Aktiviere den Home-Button im Pixel-Stil mit Animationen.</string>
     <string name="please_install_pixel_navbar">Bitte installiere die Pixel-Navigationsleiste von Google Play.</string>
-	<string name="use_google_sans">Google Sans</string>
+    <string name="use_google_sans">Google Sans</string>
     <string name="use_google_sans_summary">Verwende die Google Sans-Schriftart an verschiedenen Stellen im System-UI</string>
 </resources>
