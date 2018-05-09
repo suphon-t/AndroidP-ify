@@ -44,6 +44,6 @@
     <string name="use_new_transitions_title">使用新轉場動畫</string>
     <string name="use_new_transitions_summary">切換應用程式時顯示</string>
     <string name="use_pixel_home_button_title">Pixel 首頁按鈕</string>
-    <string name="use_pixel_home_button_summary">啟用動態 Pixel 風格主頁鍵按鈕/string>
+    <string name="use_pixel_home_button_summary">啟用動態 Pixel 風格主頁鍵按鈕</string>
     <string name="please_install_pixel_navbar">請從 Play 商店安裝 Pixel Navigation Bar</string>
 </resources>
