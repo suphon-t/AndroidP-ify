@@ -60,5 +60,6 @@ object ConfigUtils {
     class MiscConfig(prefs: SharedPreferences) {
         val newTransitions = prefs.getBoolean(PreferencesList.newTransitions, true)
         val googleSans = prefs.getBoolean(PreferencesList.googleSans, true)
+        val proxyOverview = prefs.getBoolean(PreferencesList.proxyOverview, true)
     }
 }

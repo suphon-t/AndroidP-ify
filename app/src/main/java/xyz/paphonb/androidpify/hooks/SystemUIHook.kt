@@ -42,6 +42,8 @@ object SystemUIHook : IXposedHookLoadPackage {
                 val app = param.thisObject as Application
                 val handler = Handler(app.mainLooper)
 
+                RecentsHook.onCreate(app)
+
                 app.registerReceiver(object : BroadcastReceiver() {
                     override fun onReceive(context: Context, intent: Intent) {
                         handler.postDelayed({ Process.killProcess(Process.myPid()) }, 100)
