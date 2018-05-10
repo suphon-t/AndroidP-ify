@@ -71,6 +71,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classCellTileView by lazy { XposedHelpers.findClass("com.android.systemui.qs.CellTileView", classLoader) }
     private val classSignalIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.CellTileView\$SignalIcon", classLoader) }
     private val classBatteryMeterView by lazy { XposedHelpers.findClass("com.android.systemui.BatteryMeterView", classLoader) }
+    private val classPageIndicator by lazy { XposedHelpers.findClass("com.android.systemui.qs.PageIndicator", classLoader) }
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
@@ -642,6 +643,19 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     val drawable = param.result
                     XposedHelpers.callMethod(drawable, "setColors",
                             0x4dffffff, Color.WHITE)
+                }
+            })
+
+            XposedBridge.hookAllMethods(classPageIndicator, "setNumPages", object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val indicator = param.thisObject as ViewGroup
+                    val accentColor = indicator.context.getColorAccent()
+                    for (i in (0 until indicator.childCount)) {
+                        val child = indicator.getChildAt(i)
+                        if (child is ImageView) {
+                            child.imageTintList = ColorStateList.valueOf(accentColor)
+                        }
+                    }
                 }
             })
         }
