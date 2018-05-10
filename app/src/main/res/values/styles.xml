@@ -1,19 +1,26 @@
 <resources>
 
     <style name="SettingsTheme.Base" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
         <item name="colorPrimary">?android:windowBackground</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">?android:windowBackground</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="actionBarTheme">@style/SettingsTheme.ActionBar</item>
+        <item name="actionBarTheme">@style/SettingsTheme.Toolbar</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <item name="android:colorEdgeEffect">?colorAccent</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
+
     <style name="SettingsTheme" parent="SettingsTheme.Base" />
-    <style name="SettingsTheme.ActionBar" parent="SettingsTheme">
-        <item name="android:textColorPrimary">?attr/colorAccent</item>
-        <item name="android:textColorSecondary">?attr/colorAccent</item>
-        <item name="android:colorControlNormal">?attr/colorAccent</item>
+
+    <style name="SettingsTheme.Toolbar.Title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="fontFamily">@font/google_sans</item>
+    </style>
+
+    <style name="SettingsTheme.Toolbar" parent="ThemeOverlay.AppCompat.Light">
+        <item name="titleTextAppearance">@style/SettingsTheme.Toolbar.Title</item>
+        <item name="colorPrimary">?android:windowBackground</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <style name="SearchBar" parent="@android:style/TextAppearance.Material.Widget.Toolbar.Subtitle">

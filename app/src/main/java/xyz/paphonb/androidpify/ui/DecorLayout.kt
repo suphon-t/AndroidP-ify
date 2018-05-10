@@ -50,6 +50,7 @@ class DecorLayout(context: Context, private val window: Window) : FrameLayout(co
         statusBarBackground = findViewById(R.id.status_bar_bg)
         navigationBarBackground = findViewById(R.id.nav_bar_bg)
         navigationBarDivider = findViewById(R.id.nav_bar_divider)
+        navigationBarDivider.visibility = View.GONE
     }
 
     override fun onApplyWindowInsets(i: WindowInsets): WindowInsets {
