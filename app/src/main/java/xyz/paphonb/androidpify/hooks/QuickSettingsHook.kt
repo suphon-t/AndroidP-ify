@@ -251,16 +251,30 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         systemIcons.layoutParams.height = qsHeaderSystemIconsAreaHeight
 
                         // Move clock to left side
-                        val clock = systemIcons.findViewById<View>(context.resources.getIdentifier(
-                                "clock", "id", MainHook.PACKAGE_SYSTEMUI))
-                        systemIcons.removeView(clock)
-                        systemIcons.addView(clock, 0)
-                        // Swap clock padding too
-                        clock.setPadding(clock.paddingRight, clock.paddingTop,
-                                clock.paddingLeft, clock.paddingBottom)
+                        systemIcons.findViewById<View?>(context.resources.getIdentifier(
+                                "clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
+                            systemIcons.removeView(this)
+                            systemIcons.addView(this, 0)
+                            // Swap clock padding too
+                            setPadding(paddingRight, paddingTop, paddingLeft, paddingBottom)
+                        }
+
+                        systemIcons.findViewById<View?>(context.resources.getIdentifier(
+                                "qs_clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
+                            systemIcons.removeView(this)
+                            systemIcons.addView(this, 0)
+                            // Swap clock padding too
+                            setPadding(paddingRight, paddingTop, paddingLeft, paddingBottom)
+                        }
 
                         systemIcons.findViewById<View?>(context.resources.getIdentifier(
                                 "left_clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
+                            systemIcons.removeView(this)
+                            systemIcons.addView(this, 0)
+                        }
+
+                        systemIcons.findViewById<View?>(context.resources.getIdentifier(
+                                "qs_left_clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
                             systemIcons.removeView(this)
                             systemIcons.addView(this, 0)
                         }
