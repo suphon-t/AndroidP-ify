@@ -24,9 +24,21 @@
         android:summary="@string/use_pixel_home_button_summary"
         android:title="@string/use_pixel_home_button_title"/>
 
-    <Preference
-        android:key="proxy_overview"
-        android:summary="@string/proxy_overview_summary"
-        android:title="@string/proxy_overview_title"
-        android:defaultValue="true"/>
+    <PreferenceCategory
+        android:title="@string/proxy_overview_category">
+
+        <SwitchPreference
+            android:key="proxy_overview"
+            android:summary="@string/proxy_overview_summary"
+            android:title="@string/enable_proxy_overview_title"
+            android:defaultValue="true"/>
+
+        <android.support.v7.preference.DropDownPreference
+            android:key="proxy_overview_package"
+            android:title="@string/proxy_package_title"
+            android:summary="%s"
+            android:entries="@array/proxy_packages"
+            android:entryValues="@array/proxy_package_values"
+            android:defaultValue="com.google.android.apps.nexuslauncher" />
+    </PreferenceCategory>
 </PreferenceScreen>

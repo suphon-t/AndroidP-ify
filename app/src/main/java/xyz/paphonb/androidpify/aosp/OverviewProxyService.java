@@ -2,7 +2,6 @@ package xyz.paphonb.androidpify.aosp;
 
 import android.annotation.SuppressLint;
 import android.content.*;
-import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.*;
 import android.os.IBinder.DeathRecipient;
@@ -11,6 +10,7 @@ import com.android.systemui.shared.recents.IOverviewProxy;
 import com.android.systemui.shared.recents.ISystemUiProxy;
 import com.android.systemui.shared.system.GraphicBufferCompat;
 import de.robv.android.xposed.XposedHelpers;
+import xyz.paphonb.androidpify.MainHook;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -165,14 +165,7 @@ public class OverviewProxyService implements CallbackController<OverviewProxySer
     }
 
     private ComponentName getRecentsComponent() {
-        String recentsActivity = "com.android.quickstep.RecentsActivity";
-        ComponentName recentsComponent = new ComponentName("com.google.android.apps.nexuslauncher", recentsActivity);
-        try {
-            mContext.getPackageManager().getActivityInfo(recentsComponent, PackageManager.GET_META_DATA);
-            return recentsComponent;
-        } catch (PackageManager.NameNotFoundException e) {
-            return new ComponentName("com.google.android.apps.moddednexuslauncher", recentsActivity);
-        }
+        return new ComponentName(MainHook.INSTANCE.getPACKAGE_LAUNCHER(), "com.android.quickstep.RecentsActivity");
     }
 
     public void startConnectionToCurrentUser() {

@@ -61,5 +61,6 @@ object ConfigUtils {
         val newTransitions = prefs.getBoolean(PreferencesList.newTransitions, true)
         val googleSans = prefs.getBoolean(PreferencesList.googleSans, true)
         val proxyOverview = prefs.getBoolean(PreferencesList.proxyOverview, true)
+        val proxyOverviewPackage = prefs.getString(PreferencesList.proxyOverviewPackage, "com.google.android.apps.nexuslauncher")!!
     }
 }

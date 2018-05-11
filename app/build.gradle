@@ -24,10 +24,10 @@ android {
 
         if (System.getenv("TRAVIS") == "true") {
             versionCode = Integer.valueOf(System.getenv("TRAVIS_BUILD_NUMBER"))
-            versionName = System.getenv("MAJOR_MINOR") + " beta #" + System.getenv("TRAVIS_BUILD_NUMBER")
+            versionName = System.getenv("MAJOR_MINOR") + " #" + System.getenv("TRAVIS_BUILD_NUMBER")
         } else {
             versionCode 1
-            versionName "0.2.0 beta"
+            versionName "1.0.0"
         }
     }
     buildTypes {

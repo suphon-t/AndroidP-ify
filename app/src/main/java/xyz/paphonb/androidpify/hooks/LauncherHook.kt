@@ -134,6 +134,13 @@ object LauncherHook : IXposedHookLoadPackage {
                 }
             }
         })
+
+        val recentsView = XposedHelpers.findClass("com.android.quickstep.views.RecentsView", lpparam.classLoader)
+        XposedHelpers.findAndHookMethod(recentsView, "isRecentsEnabled", object : XC_MethodHook() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
+                param.result = true
+            }
+        })
     }
 
     fun getViewBounds(source: View): Rect {
