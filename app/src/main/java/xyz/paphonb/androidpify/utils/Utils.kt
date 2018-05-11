@@ -94,9 +94,10 @@ fun Any.logE(msg: String, throwable: Throwable? = null) {
     MainHook.logE(javaClass.simpleName, msg, throwable)
 }
 
-fun TextView.setGoogleSans(style: String = "Regular") {
-    if (!ConfigUtils.misc.googleSans) return
+fun TextView.setGoogleSans(style: String = "Regular"): Boolean {
+    if (!ConfigUtils.misc.googleSans) return false
     typeface = Typeface.createFromAsset(ResourceUtils.getInstance(context).assets, "fonts/GoogleSans-$style.ttf")
+    return true
 }
 
 val View.resUtils get() = ResourceUtils.getInstance(context)!!
