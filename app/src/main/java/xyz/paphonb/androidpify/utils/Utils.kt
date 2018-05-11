@@ -17,10 +17,13 @@
 package xyz.paphonb.androidpify.utils
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.support.annotation.ColorInt
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import xyz.paphonb.androidpify.MainHook
 
@@ -91,7 +94,37 @@ fun Any.logE(msg: String, throwable: Throwable? = null) {
     MainHook.logE(javaClass.simpleName, msg, throwable)
 }
 
-fun TextView.setGoogleSans(style: String = "Regular") {
-    if (!ConfigUtils.misc.googleSans) return
+fun TextView.setGoogleSans(style: String = "Regular"): Boolean {
+    if (!ConfigUtils.misc.googleSans) return false
     typeface = Typeface.createFromAsset(ResourceUtils.getInstance(context).assets, "fonts/GoogleSans-$style.ttf")
+    return true
+}
+
+val View.resUtils get() = ResourceUtils.getInstance(context)!!
+
+inline fun ViewGroup.forEachChild(body: (View) -> Unit) {
+    for (i in (0 until childCount)) body(getChildAt(i))
+}
+
+fun ViewGroup.moveChildsTo(newParent: ViewGroup) {
+    while (childCount > 0) {
+        val child = getChildAt(0)
+        removeViewAt(0)
+        newParent.addView(child)
+    }
+}
+
+fun Resources.getIdSystemUi(name: String) = getIdentifier(name, "id", MainHook.PACKAGE_SYSTEMUI)
+
+fun Resources.getLayoutSystemUi(name: String) = getIdentifier(name, "layout", MainHook.PACKAGE_SYSTEMUI)
+
+fun Resources.getDimenSystemUi(name: String) = getDimensionPixelSize(getIdentifier(name, "dimen", MainHook.PACKAGE_SYSTEMUI))
+
+inline fun logThrowable(tag: String, message: String, body: () -> Unit) {
+    try {
+        body()
+    } catch (t: Throwable) {
+        MainHook.logE(tag, message, t)
+        throw t
+    }
 }
