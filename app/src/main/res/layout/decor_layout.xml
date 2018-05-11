@@ -34,13 +34,12 @@
             android:layout_height="wrap_content"
             android:background="?android:windowBackground">
 
-            <android.support.v7.widget.Toolbar
+            <xyz.paphonb.androidpify.ui.CenteredToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?colorPrimary"
-                app:titleTextColor="?colorAccent"
-                android:theme="@style/SettingsTheme.ActionBar" />
+                app:theme="?actionBarTheme"/>
         </FrameLayout>
     </FrameLayout>
 

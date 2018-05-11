@@ -33,6 +33,9 @@
             android:name="xposeddescription"
             android:value="@string/xposed_description" />
         <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+        <meta-data
             android:name="xposedminversion"
             android:value="90" />
 

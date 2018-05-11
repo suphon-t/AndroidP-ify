@@ -22,6 +22,7 @@ import de.robv.android.xposed.*
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import xyz.paphonb.androidpify.hooks.*
+import xyz.paphonb.androidpify.hooks.helpers.PermissionGranter
 import xyz.paphonb.androidpify.ui.SettingsActivity
 import xyz.paphonb.androidpify.utils.ConfigUtils
 
@@ -46,6 +47,8 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
         NotificationStackHook.handleLoadPackage(lpparam)
         QuickSettingsHook.handleLoadPackage(lpparam)
         SettingsHook.handleLoadPackage(lpparam)
+        RecentsHook.handleLoadPackage(lpparam)
+        LauncherHook.handleLoadPackage(lpparam)
 
         if (lpparam.packageName == PACKAGE_OWN) {
             XposedHelpers.findAndHookMethod(SETTINGS_OWN, lpparam.classLoader,
@@ -53,6 +56,8 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
             XposedHelpers.findAndHookMethod(SETTINGS_OWN, lpparam.classLoader,
                     "isPrefsFileReadable", XC_MethodReplacement.returnConstant(
                     ConfigUtils.prefs.getBoolean("can_read_prefs", false)))
+        } else if (lpparam.packageName == PACKAGE_ANDROID) {
+            PermissionGranter.initAndroid(lpparam.classLoader)
         }
     }
 
@@ -69,6 +74,7 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
     const val PACKAGE_ANDROID = "android"
     const val PACKAGE_SYSTEMUI = "com.android.systemui"
     const val PACKAGE_SETTINGS = "com.android.settings"
+    const val PACKAGE_LAUNCHER = "com.google.android.apps.nexuslauncher"
 
     const val PACKAGE_OWN = "xyz.paphonb.androidpify"
     private val SETTINGS_OWN = SettingsActivity.BaseFragment::class.java.name

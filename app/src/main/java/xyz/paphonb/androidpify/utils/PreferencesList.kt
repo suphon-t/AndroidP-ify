@@ -30,6 +30,7 @@ object PreferencesList {
             put(changeSettingsTheme, LEVEL_ANDROID)
             put(newTransitions, LEVEL_ANDROID)
             put(googleSans, LEVEL_SYSTEM_UI)
+            put(proxyOverview, LEVEL_SYSTEM_UI)
         }
     }
 
@@ -45,6 +46,7 @@ object PreferencesList {
 
     const val newTransitions = "use_new_transitions"
     const val googleSans = "use_google_sans"
+    const val proxyOverview = "proxy_overview"
 
     const val LEVEL_SYSTEM_UI = 1 shl 0
     const val LEVEL_ANDROID = 1 shl 1

@@ -43,4 +43,6 @@
     <string name="use_pixel_home_button_title">Pixel-ի հիմնական կոճակ</string>
     <string name="use_pixel_home_button_summary">Միացնել Pixel-ի ոճով հիմնական կոճակը իր անիմացիաներով</string>
     <string name="please_install_pixel_navbar">Խնդրում ենք տեղադրել Pixel Navigation Bar-ը Google Play-ից</string>
+    <string name="use_google_sans">Google Sans</string>
+    <string name="use_google_sans_summary">Օգտագործել Google Sans տառատեսակը System UI-ի տարբեր մասերում։</string>
 </resources>
