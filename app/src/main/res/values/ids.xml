@@ -7,4 +7,6 @@
     <item name="quick_qs_footer_layout" type="id" />
     <item name="qs_tile_background" type="id" />
     <item name="qs_scroll_layout" type="id" />
+    <item name="quick_qs_tooltip" type="id" />
+    <item name="mobile_signal_group" type="id" />
 </resources>

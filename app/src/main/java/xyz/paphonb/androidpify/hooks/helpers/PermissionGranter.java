@@ -20,8 +20,6 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import xyz.paphonb.androidpify.MainHook;
 
-import java.util.List;
-
 public class PermissionGranter {
     public static final String TAG = "GB:PermissionGranter";
     public static final boolean DEBUG = false;
@@ -54,13 +52,11 @@ public class PermissionGranter {
                             final String pkgName = (String) XposedHelpers.getObjectField(param.args[0], "packageName");
                             final Object extras = XposedHelpers.getObjectField(param.args[0], "mExtras");
                             final Object ps = XposedHelpers.callMethod(extras, "getPermissionsState");
-                            final List<String> grantedPerms =
-                                    (List<String>) XposedHelpers.getObjectField(param.args[0], "requestedPermissions");
                             final Object settings = XposedHelpers.getObjectField(param.thisObject, "mSettings");
                             final Object permissions = XposedHelpers.getObjectField(settings, "mPermissions");
 
                             // Launcher
-                            if (MainHook.PACKAGE_LAUNCHER.equals(pkgName)) {
+                            if (MainHook.INSTANCE.getPACKAGE_LAUNCHER().equals(pkgName)) {
                                 grantPerm(ps, permissions, GET_TASKS);
                                 grantPerm(ps, permissions, REMOVE_TASKS);
                                 grantPerm(ps, permissions, REAL_GET_TASKS);

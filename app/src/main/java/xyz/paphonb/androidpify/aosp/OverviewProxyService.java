@@ -10,6 +10,7 @@ import com.android.systemui.shared.recents.IOverviewProxy;
 import com.android.systemui.shared.recents.ISystemUiProxy;
 import com.android.systemui.shared.system.GraphicBufferCompat;
 import de.robv.android.xposed.XposedHelpers;
+import xyz.paphonb.androidpify.MainHook;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -149,7 +150,7 @@ public class OverviewProxyService implements CallbackController<OverviewProxySer
         this.mContext = context;
         this.mHandler = new Handler();
         this.mConnectionBackoffAttempts = 0;
-        this.mRecentsComponentName = ComponentName.unflattenFromString("com.google.android.apps.nexuslauncher/com.android.quickstep.RecentsActivity");
+        this.mRecentsComponentName = getRecentsComponent();
         this.mQuickStepIntent = new Intent("android.intent.action.QUICKSTEP_SERVICE").setPackage(this.mRecentsComponentName.getPackageName());
         this.mInteractionFlags = Prefs.getInt(this.mContext, "QuickStepInteractionFlags", 0);
 //        if (SystemServicesProxy.getInstance(context).isSystemUser(this.mDeviceProvisionedController.getCurrentUser())) {
@@ -161,6 +162,10 @@ public class OverviewProxyService implements CallbackController<OverviewProxySer
             filter.addAction("android.intent.action.PACKAGE_CHANGED");
             this.mContext.registerReceiver(this.mLauncherStateChangedReceiver, filter);
 //        }
+    }
+
+    private ComponentName getRecentsComponent() {
+        return new ComponentName(MainHook.INSTANCE.getPACKAGE_LAUNCHER(), "com.android.quickstep.RecentsActivity");
     }
 
     public void startConnectionToCurrentUser() {

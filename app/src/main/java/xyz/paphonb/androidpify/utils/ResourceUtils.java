@@ -22,14 +22,8 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-
+import android.support.annotation.*;
+import android.view.View;
 import xyz.paphonb.androidpify.MainHook;
 
 public class ResourceUtils {
@@ -58,6 +52,10 @@ public class ResourceUtils {
         if (mInstance == null)
             mInstance = new ResourceUtils(context);
         return mInstance;
+    }
+
+    public static ResourceUtils getInstance(View view) {
+        return getInstance(view.getContext());
     }
 
     public final XmlResourceParser getLayout(@LayoutRes int resId) {

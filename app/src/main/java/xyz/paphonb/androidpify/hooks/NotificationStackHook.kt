@@ -413,7 +413,11 @@ object NotificationStackHook : IXposedHookLoadPackage, IXposedHookInitPackageRes
                     override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
                         val id = liparam.view.context.resources.getIdentifier(
                                 "dismiss_text", "id", MainHook.PACKAGE_SYSTEMUI)
-                        liparam.view.findViewById<TextView>(id)?.setGoogleSans()
+                        liparam.view.findViewById<TextView>(id)?.run {
+                            if (setGoogleSans("Medium")) {
+                                setAllCaps(false)
+                            }
+                        }
                     }
                 })
     }
