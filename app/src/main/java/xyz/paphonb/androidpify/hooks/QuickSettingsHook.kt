@@ -757,9 +757,6 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                             val qsPanel = param.thisObject as ViewGroup
                             val brightnessView = XposedHelpers.getObjectField(qsPanel, "mBrightnessView") as View
 
-                            (qsPanel.layoutParams as MarginLayoutParams).bottomMargin =
-                                    qsPanel.resUtils.getDimensionPixelSize(R.dimen.qs_footer_height)
-
                             brightnessView.setPadding(
                                     brightnessView.paddingLeft,
                                     qsPanel.paddingTop,
