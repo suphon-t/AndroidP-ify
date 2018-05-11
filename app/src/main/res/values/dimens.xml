@@ -32,4 +32,7 @@
     <dimen name="signal_indicator_to_icon_frame_spacing">3dp</dimen>
     <dimen name="qs_footer_height">56dp</dimen>
     <dimen name="settings_container_top_margin">4dp</dimen>
+    <dimen name="qs_panel_padding_top">30dp</dimen>
+    <dimen name="qs_header_tooltip_height">18dp</dimen>
+    <dimen name="qs_header_tooltip_margin_top">12dp</dimen>
 </resources>

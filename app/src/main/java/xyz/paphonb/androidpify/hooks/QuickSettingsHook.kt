@@ -7,6 +7,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Point
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -180,14 +181,16 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         date.setTextColor(Color.WHITE)
                         date.setPadding(datePaddings, datePaddings, datePaddings, datePaddings)
                         (date.parent as ViewGroup).removeView(carrierText)
+                        (date.parent as ViewGroup).removeView(date)
                         (date.layoutParams as LinearLayout.LayoutParams).apply {
                             width = 0
                             weight = 1f
                         }
 
+                        val tooltip = qsContainer.findViewById<ViewGroup>(R.id.quick_qs_tooltip)
                         val footerLayout = qsContainer.findViewById<ViewGroup>(R.id.quick_qs_footer_layout)
                         val footerLeft = footerLayout.getChildAt(0) as ViewGroup
-                        footerLeft.removeAllViews()
+                        footerLeft.moveChildsTo(tooltip)
                         footerLeft.addView(carrierText)
                         footerLeft.background = null
                         footerLeft.setOnClickListener(null)
@@ -266,6 +269,9 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         val quickQsStatusIcons = LinearLayout(context)
                         quickQsStatusIcons.id = R.id.quick_qs_status_icons
 
+                        val tooltip = LinearLayout(context)
+                        tooltip.id = R.id.quick_qs_tooltip
+
                         val ownResources = ResourceUtils.getInstance(context)
                         if (headerLayout is RelativeLayout) {
                             quickQsStatusIcons.layoutParams = RelativeLayout.LayoutParams(
@@ -275,15 +281,30 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                                 topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top)
                                 bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
                             }
+                            tooltip.layoutParams = RelativeLayout.LayoutParams(
+                                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                    ownResources.getDimensionPixelSize(R.dimen.qs_header_tooltip_height)).apply {
+                                addRule(RelativeLayout.BELOW, R.id.quick_qs_system_icons)
+                                addRule(RelativeLayout.CENTER_HORIZONTAL)
+                                topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_header_tooltip_margin_top)
+                            }
                         } else {
                             quickQsStatusIcons.layoutParams = FrameLayout.LayoutParams(
-                                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                                    FrameLayout.LayoutParams.MATCH_PARENT,
                                     ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_height)).apply {
                                 topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_top) +
                                         systemIcons.layoutParams.height
                                 bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_status_icons_margin_bottom)
                             }
+                            tooltip.layoutParams = FrameLayout.LayoutParams(
+                                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                                    ownResources.getDimensionPixelSize(R.dimen.qs_header_tooltip_height)).apply {
+                                topMargin = ownResources.getDimensionPixelSize(R.dimen.qs_header_tooltip_margin_top) +
+                                        systemIcons.layoutParams.height
+                                gravity = Gravity.CENTER_HORIZONTAL
+                            }
                         }
+                        headerLayout.addView(tooltip, 0)
                         headerLayout.addView(quickQsStatusIcons, 0)
 
                         val statusIcons = StatusIconContainer(context, lpparam.classLoader)
@@ -334,12 +355,17 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     val header = param.thisObject as ViewGroup
                     val quickQsStatusIcons = header.findViewById<View>(R.id.quick_qs_status_icons)
                             ?: return
+                    val tooltip = header.findViewById<View>(R.id.quick_qs_tooltip)
                     val addFloat = XposedHelpers.findMethodExact(classTouchAnimatorBuilder, "addFloat",
                             Object::class.java, String::class.java, FloatArray::class.java)
                     val alphas = FloatArray(2)
                     alphas[0] = 1f
                     alphas[1] = 0f
+                    val alphasInverted = FloatArray(2)
+                    alphasInverted[0] = 0f
+                    alphasInverted[1] = 1f
                     addFloat.invoke(this, quickQsStatusIcons, "alpha", alphas)
+                    addFloat.invoke(this, tooltip, "alpha", alphasInverted)
                     XposedHelpers.setAdditionalInstanceField(header, "animator", XposedHelpers.callMethod(this, "build"))
                 }
             }
@@ -425,18 +451,37 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     }
                 })
 
-        val clearAlarmShowing = object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
+        var alarmShowing = false
+        XposedBridge.hookAllMethods(footerClass, "onNextAlarmChanged", object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                alarmShowing = XposedHelpers.getBooleanField(param.thisObject, "mAlarmShowing")
                 XposedHelpers.setBooleanField(param.thisObject, "mAlarmShowing", false)
+            }
+        })
+
+        findAndHookMethod(footerClass, "updateAnimator", Int::class.java, object : XC_MethodHook() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
                 val animator = XposedHelpers.getObjectField(param.thisObject, "mAnimator")
                 if (animator != null) {
                     XposedHelpers.callMethod(animator, "setPosition", 1f)
                 }
                 XposedHelpers.setObjectField(param.thisObject, "mAnimator", null)
             }
-        }
-        findAndHookMethod(footerClass, "updateAnimator", Int::class.java, clearAlarmShowing)
-        findAndHookMethod(footerClass, "updateAlarmVisibilities", clearAlarmShowing)
+        })
+
+        findAndHookMethod(footerClass, "updateAlarmVisibilities", object : XC_MethodHook() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
+                val alarm = XposedHelpers.getObjectField(param.thisObject, "mAlarmStatus") as TextView
+                val alarmCollapsed = XposedHelpers.getObjectField(param.thisObject, "mAlarmStatusCollapsed") as View
+                val visibility = if (alarmShowing) View.VISIBLE else View.GONE
+                alarm.textSize = 12f
+                alarm.typeface = Typeface.create("sans-serif", Typeface.NORMAL)
+                alarm.alpha = 1f
+                alarm.visibility = visibility
+                alarmCollapsed.visibility = visibility
+                param.result = null
+            }
+        })
 
         findAndHookMethod(footerClass, "updateVisibilities",
                 object : XC_MethodHook() {
@@ -461,7 +506,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                                 FrameLayout.LayoutParams.MATCH_PARENT,
                                 FrameLayout.LayoutParams.MATCH_PARENT)
 
-                        footer.getChildAt(0).apply {
+                        val alarmGroup = footer.findViewById<View>(context.resources.getIdSystemUi("date_time_alarm_group"))
+                        alarmGroup.apply {
                             footer.removeView(this)
                             layout.addView(this)
                             layoutParams = LinearLayout.LayoutParams(layoutParams as ViewGroup.MarginLayoutParams).apply {
@@ -716,6 +762,18 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                                 qsPanel.addView(if (brightnessFirst) brightnessView else tileLayout, minIndex)
                                 qsPanel.addView(if (brightnessFirst) tileLayout else brightnessView, maxIndex)
                             }
+
+                            (qsPanel.getChildAt(0).layoutParams as MarginLayoutParams)
+                                    .topMargin = qsPanel.resUtils.getDimensionPixelSize(R.dimen.qs_panel_padding_top)
+                        }
+                    })
+        } else {
+            findAndHookConstructor(classQSPanel, Context::class.java, AttributeSet::class.java,
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val qsPanel = param.thisObject as ViewGroup
+                            (qsPanel.getChildAt(0).layoutParams as MarginLayoutParams)
+                                    .topMargin = qsPanel.resUtils.getDimensionPixelSize(R.dimen.qs_panel_padding_top)
                         }
                     })
         }
@@ -754,16 +812,9 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
             findAndHookMethod(classQSPanel, "updateResources",
                     object : XC_MethodHook() {
                         override fun afterHookedMethod(param: MethodHookParam) {
-                            val qsPanel = param.thisObject as ViewGroup
-                            val brightnessView = XposedHelpers.getObjectField(qsPanel, "mBrightnessView") as View
-
-                            brightnessView.setPadding(
-                                    brightnessView.paddingLeft,
-                                    qsPanel.paddingTop,
-                                    brightnessView.paddingRight,
-                                    brightnessView.paddingBottom)
-
-                            qsPanel.setPadding(0, 0, 0, qsPanel.paddingBottom)
+                            logThrowable("QuickSettingsHook", "Uncaught throwable in updateResources") {
+//                                qsPanelUpdateResources(param.thisObject as ViewGroup)
+                            }
                         }
                     })
 
@@ -849,6 +900,24 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         }
                     }
                 })
+    }
+
+    fun qsPanelUpdateResources(qsPanel: ViewGroup) {
+        val brightnessView = XposedHelpers.getObjectField(qsPanel, "mBrightnessView") as View
+
+        brightnessView.setPadding(
+                brightnessView.paddingLeft,
+                brightnessView.resources.getDimenSystemUi("qs_brightness_padding_top"),
+                brightnessView.paddingRight,
+                brightnessView.paddingBottom)
+
+        MainHook.logD("QSHook", "padding b: ${qsPanel.paddingLeft}, ${qsPanel.paddingTop}, ${qsPanel.paddingRight}, ${qsPanel.paddingBottom}")
+
+        qsPanel.setPadding(
+                0, 69,
+                0, qsPanel.paddingBottom)
+
+        MainHook.logD("QSHook", "padding a: ${qsPanel.paddingLeft}, ${qsPanel.paddingTop}, ${qsPanel.paddingRight}, ${qsPanel.paddingBottom}")
     }
 
     private fun getCircleColor(view: ViewGroup, state: Int): Int {

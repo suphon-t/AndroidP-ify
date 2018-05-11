@@ -105,4 +105,23 @@ inline fun ViewGroup.forEachChild(body: (View) -> Unit) {
     for (i in (0 until childCount)) body(getChildAt(i))
 }
 
+fun ViewGroup.moveChildsTo(newParent: ViewGroup) {
+    while (childCount > 0) {
+        val child = getChildAt(0)
+        removeViewAt(0)
+        newParent.addView(child)
+    }
+}
+
 fun Resources.getIdSystemUi(name: String) = getIdentifier(name, "id", MainHook.PACKAGE_SYSTEMUI)
+
+fun Resources.getDimenSystemUi(name: String) = getDimensionPixelSize(getIdentifier(name, "dimen", MainHook.PACKAGE_SYSTEMUI))
+
+inline fun logThrowable(tag: String, message: String, body: () -> Unit) {
+    try {
+        body()
+    } catch (t: Throwable) {
+        MainHook.logE(tag, message, t)
+        throw t
+    }
+}
