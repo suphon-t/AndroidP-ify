@@ -47,4 +47,7 @@
 	<string name="use_google_sans_summary">在所有系统用户界面使用Google Sans字体</string>
 	<string name="proxy_overview_title">Android P 多任务样式</string>
 	<string name="proxy_overview_summary">需要Pixel Launcher Q-4753642版本才能运行\n（实验性功能，将来有可能会被删除）</string>
+	<string name="proxy_overview_category">Android P 多任务界面样式</string>
+	<string name="enable_proxy_overview_title">启用</string>
+	<string name="proxy_package_title">请选择多任务界面针对的启动器版本</string>
 </resources>
