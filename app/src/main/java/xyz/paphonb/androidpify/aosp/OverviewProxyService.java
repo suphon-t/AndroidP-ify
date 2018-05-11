@@ -2,6 +2,7 @@ package xyz.paphonb.androidpify.aosp;
 
 import android.annotation.SuppressLint;
 import android.content.*;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.*;
 import android.os.IBinder.DeathRecipient;
@@ -149,7 +150,7 @@ public class OverviewProxyService implements CallbackController<OverviewProxySer
         this.mContext = context;
         this.mHandler = new Handler();
         this.mConnectionBackoffAttempts = 0;
-        this.mRecentsComponentName = ComponentName.unflattenFromString("com.google.android.apps.nexuslauncher/com.android.quickstep.RecentsActivity");
+        this.mRecentsComponentName = getRecentsComponent();
         this.mQuickStepIntent = new Intent("android.intent.action.QUICKSTEP_SERVICE").setPackage(this.mRecentsComponentName.getPackageName());
         this.mInteractionFlags = Prefs.getInt(this.mContext, "QuickStepInteractionFlags", 0);
 //        if (SystemServicesProxy.getInstance(context).isSystemUser(this.mDeviceProvisionedController.getCurrentUser())) {
@@ -161,6 +162,17 @@ public class OverviewProxyService implements CallbackController<OverviewProxySer
             filter.addAction("android.intent.action.PACKAGE_CHANGED");
             this.mContext.registerReceiver(this.mLauncherStateChangedReceiver, filter);
 //        }
+    }
+
+    private ComponentName getRecentsComponent() {
+        String recentsActivity = "com.android.quickstep.RecentsActivity";
+        ComponentName recentsComponent = new ComponentName("com.google.android.apps.nexuslauncher", recentsActivity);
+        try {
+            mContext.getPackageManager().getActivityInfo(recentsComponent, PackageManager.GET_META_DATA);
+            return recentsComponent;
+        } catch (PackageManager.NameNotFoundException e) {
+            return new ComponentName("com.google.android.apps.moddednexuslauncher", recentsActivity);
+        }
     }
 
     public void startConnectionToCurrentUser() {
