@@ -26,6 +26,7 @@ import xyz.paphonb.androidpify.R
 import xyz.paphonb.androidpify.aosp.QSScrollLayout
 import xyz.paphonb.androidpify.aosp.StatusIconContainer
 import xyz.paphonb.androidpify.utils.*
+import xyz.paphonb.androidpify.views.MobileSignalGroup
 import kotlin.math.max
 import kotlin.math.min
 
@@ -188,10 +189,19 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                             weight = 1f
                         }
 
+                        val mobileSignalGroup = MobileSignalGroup(context, classLoader)
+                        mobileSignalGroup.id = r_mobile_signal_group
+                        mobileSignalGroup.layoutParams = MarginLayoutParams(
+                                MarginLayoutParams.WRAP_CONTENT,
+                                MarginLayoutParams.WRAP_CONTENT).apply {
+                            marginEnd =  mobileSignalGroup.resUtils.getDimensionPixelSize(R.dimen.qs_footer_mobile_group_margin_end)
+                        }
+
                         val tooltip = qsContainer.findViewById<ViewGroup>(r_quick_qs_tooltip)
                         val footerLayout = qsContainer.findViewById<ViewGroup>(r_quick_qs_footer_layout)
                         val footerLeft = footerLayout.getChildAt(0) as ViewGroup
                         footerLeft.moveChildsTo(tooltip)
+                        footerLeft.addView(mobileSignalGroup)
                         footerLeft.addView(carrierText)
                         footerLeft.background = null
                         footerLeft.setOnClickListener(null)
@@ -446,6 +456,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                             }
                             val carrierText = footer.findViewById<View>(carrierTextId)
                             val qsDragHandle = footer.findViewById<View>(R.id.qs_drag_handle_view)
+                            val mobileSignalGroup = footer.findViewById<View>(r_mobile_signal_group)
                             val addFloat = XposedHelpers.findMethodExact(classTouchAnimatorBuilder, "addFloat",
                                     Object::class.java, String::class.java, FloatArray::class.java)
                             val alphas = FloatArray(2, { it.toFloat() })
@@ -461,6 +472,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                                 addFloat.invoke(this, carrierText, "alpha", alphas)
                             if (qsDragHandle != null)
                                 addFloat.invoke(this, qsDragHandle, "alpha", alphasInverted)
+                            if (mobileSignalGroup != null)
+                                addFloat.invoke(this, mobileSignalGroup, "alpha", alphas)
                             param.result = XposedHelpers.callMethod(this, "build")
                         }
                     }
@@ -546,6 +559,18 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         footer.addView(layout)
                     }
                 })
+
+        findAndHookMethod(footerClass, "setListening", Boolean::class.java, object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                val footer = param.thisObject as ViewGroup
+                val mobileSignalGroup = footer.findViewById<View>(r_mobile_signal_group) as? MobileSignalGroup
+                if (mobileSignalGroup != null) {
+                    mobileSignalGroup.listening = param.args[0] as Boolean
+                } else {
+                    MainHook.logE("QuickSettingsHook", "mobile signal group is null")
+                }
+            }
+        })
 
         try {
             findAndHookMethod(classQuickStatusBarHeader, "onTuningChanged",
@@ -977,6 +1002,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     var r_qs_tile_background = R.id.qs_tile_background
     var r_qs_scroll_layout = R.id.qs_scroll_layout
     var r_quick_qs_tooltip = R.id.quick_qs_tooltip
+    var r_mobile_signal_group = R.id.mobile_signal_group
 
     override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
         if (resparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
@@ -989,6 +1015,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
         r_qs_tile_background = XResources.getFakeResId(MainHook.modRes, R.id.qs_tile_background)
         r_qs_scroll_layout = XResources.getFakeResId(MainHook.modRes, R.id.qs_scroll_layout)
         r_quick_qs_tooltip = XResources.getFakeResId(MainHook.modRes, R.id.quick_qs_tooltip)
+        r_mobile_signal_group = XResources.getFakeResId(MainHook.modRes, R.id.mobile_signal_group)
 
         if (MainHook.ATLEAST_O_MR1) {
             resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "qs_header_system_icons_area_height",

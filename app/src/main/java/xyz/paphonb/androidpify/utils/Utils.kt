@@ -116,6 +116,8 @@ fun ViewGroup.moveChildsTo(newParent: ViewGroup) {
 
 fun Resources.getIdSystemUi(name: String) = getIdentifier(name, "id", MainHook.PACKAGE_SYSTEMUI)
 
+fun Resources.getLayoutSystemUi(name: String) = getIdentifier(name, "layout", MainHook.PACKAGE_SYSTEMUI)
+
 fun Resources.getDimenSystemUi(name: String) = getDimensionPixelSize(getIdentifier(name, "dimen", MainHook.PACKAGE_SYSTEMUI))
 
 inline fun logThrowable(tag: String, message: String, body: () -> Unit) {
