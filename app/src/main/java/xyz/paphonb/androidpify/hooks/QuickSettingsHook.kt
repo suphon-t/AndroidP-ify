@@ -261,30 +261,34 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         systemIcons.layoutParams.height = qsHeaderSystemIconsAreaHeight
 
                         // Move clock to left side
-                        systemIcons.findViewById<View?>(context.resources.getIdentifier(
+                        systemIcons.findViewById<TextView?>(context.resources.getIdentifier(
                                 "clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
+                            setTextColor(Color.WHITE)
                             systemIcons.removeView(this)
                             systemIcons.addView(this, 0)
                             // Swap clock padding too
                             setPadding(paddingRight, paddingTop, paddingLeft, paddingBottom)
                         }
 
-                        systemIcons.findViewById<View?>(context.resources.getIdentifier(
+                        systemIcons.findViewById<TextView?>(context.resources.getIdentifier(
                                 "qs_clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
+                            setTextColor(Color.WHITE)
                             systemIcons.removeView(this)
                             systemIcons.addView(this, 0)
                             // Swap clock padding too
                             setPadding(paddingRight, paddingTop, paddingLeft, paddingBottom)
                         }
 
-                        systemIcons.findViewById<View?>(context.resources.getIdentifier(
+                        systemIcons.findViewById<TextView?>(context.resources.getIdentifier(
                                 "left_clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
+                            setTextColor(Color.WHITE)
                             systemIcons.removeView(this)
                             systemIcons.addView(this, 0)
                         }
 
-                        systemIcons.findViewById<View?>(context.resources.getIdentifier(
+                        systemIcons.findViewById<TextView?>(context.resources.getIdentifier(
                                 "qs_left_clock", "id", MainHook.PACKAGE_SYSTEMUI))?.apply {
+                            setTextColor(Color.WHITE)
                             systemIcons.removeView(this)
                             systemIcons.addView(this, 0)
                         }
