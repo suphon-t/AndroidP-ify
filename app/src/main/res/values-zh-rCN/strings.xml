@@ -43,4 +43,8 @@
 	<string name="use_pixel_home_button_title">Pixel风格导航栏按钮</string>
 	<string name="use_pixel_home_button_summary">启用带有Pixel风格动画的桌面导航按钮</string>
 	<string name="please_install_pixel_navbar">请从Google Play安装Pixel Navigation Bar并启用</string>
+	<string name="use_google_sans">启用Google Sans字体</string>
+	<string name="use_google_sans_summary">在所有系统用户界面使用Google Sans字体</string>
+	<string name="proxy_overview_title">Android P 多任务样式</string>
+	<string name="proxy_overview_summary">需要Pixel Launcher Q-4753642版本才能运行\n（实验性功能，将来有可能会被删除）</string>
 </resources>
