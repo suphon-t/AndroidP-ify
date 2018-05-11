@@ -17,10 +17,13 @@
 package xyz.paphonb.androidpify.utils
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.support.annotation.ColorInt
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import xyz.paphonb.androidpify.MainHook
 
@@ -95,3 +98,11 @@ fun TextView.setGoogleSans(style: String = "Regular") {
     if (!ConfigUtils.misc.googleSans) return
     typeface = Typeface.createFromAsset(ResourceUtils.getInstance(context).assets, "fonts/GoogleSans-$style.ttf")
 }
+
+val View.resUtils get() = ResourceUtils.getInstance(context)!!
+
+inline fun ViewGroup.forEachChild(body: (View) -> Unit) {
+    for (i in (0 until childCount)) body(getChildAt(i))
+}
+
+fun Resources.getIdSystemUi(name: String) = getIdentifier(name, "id", MainHook.PACKAGE_SYSTEMUI)

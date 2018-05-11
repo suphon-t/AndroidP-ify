@@ -127,15 +127,21 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         (XposedHelpers.getObjectField(param.thisObject, "mQSPanel") as View).apply {
                             elevation = qsElevation
                             setMargins(this)
-                            (layoutParams as FrameLayout.LayoutParams).topMargin = ownResources
-                                    .getDimensionPixelSize(R.dimen.quick_qs_offset_height)
+                            (layoutParams as FrameLayout.LayoutParams).apply {
+                                topMargin = ownResources.getDimensionPixelSize(R.dimen.quick_qs_offset_height)
+                                bottomMargin = ownResources.getDimensionPixelSize(R.dimen.qs_footer_height)
+                            }
                         }
 
-                        (XposedHelpers.getObjectField(param.thisObject, "mQSFooter") as View).apply {
+                        (XposedHelpers.getObjectField(param.thisObject, "mQSFooter") as ViewGroup).apply {
                             elevation = qsElevation
                             setMargins(this)
                             findViewById<View>(context.resources.getIdentifier(
                                     "expand_indicator", "id", MainHook.PACKAGE_SYSTEMUI)).visibility = View.GONE
+
+                            val actionsContainer = (getChildAt(0) as ViewGroup).run { getChildAt(childCount - 1) }
+                            (actionsContainer.layoutParams as MarginLayoutParams).topMargin =
+                                    resUtils.getDimensionPixelSize(R.dimen.settings_container_top_margin)
                         }
 
                         (XposedHelpers.getObjectField(param.thisObject, "mQSDetail") as View).apply {
@@ -398,16 +404,22 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                                 XposedHelpers.getObjectField(param.thisObject, "mSettingsButton")
                             }
                             val carrierText = footer.findViewById<View>(carrierTextId)
+                            val qsDragHandle = footer.findViewById<View>(R.id.qs_drag_handle_view)
                             val addFloat = XposedHelpers.findMethodExact(classTouchAnimatorBuilder, "addFloat",
                                     Object::class.java, String::class.java, FloatArray::class.java)
-                            val alphas = FloatArray(2)
+                            val alphas = FloatArray(2, { it.toFloat() })
                             alphas[0] = 0f
                             alphas[1] = 1f
+                            val alphasInverted = FloatArray(2, { it.toFloat() })
+                            alphasInverted[0] = 1f
+                            alphasInverted[1] = 0f
                             addFloat.invoke(this, mEdit, "alpha", alphas)
                             addFloat.invoke(this, mMultiUserSwitch, "alpha", alphas)
                             addFloat.invoke(this, mSettingsContainer, "alpha", alphas)
                             if (carrierText != null)
                                 addFloat.invoke(this, carrierText, "alpha", alphas)
+                            if (qsDragHandle != null)
+                                addFloat.invoke(this, qsDragHandle, "alpha", alphasInverted)
                             param.result = XposedHelpers.callMethod(this, "build")
                         }
                     }
@@ -416,6 +428,11 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
         val clearAlarmShowing = object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
                 XposedHelpers.setBooleanField(param.thisObject, "mAlarmShowing", false)
+                val animator = XposedHelpers.getObjectField(param.thisObject, "mAnimator")
+                if (animator != null) {
+                    XposedHelpers.callMethod(animator, "setPosition", 1f)
+                }
+                XposedHelpers.setObjectField(param.thisObject, "mAnimator", null)
             }
         }
         findAndHookMethod(footerClass, "updateAnimator", Int::class.java, clearAlarmShowing)
@@ -435,6 +452,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val footer = param.thisObject as ViewGroup
                         val context = footer.context
+
+                        footer.layoutParams.height = footer.resUtils.getDimensionPixelSize(R.dimen.qs_footer_height)
 
                         val layout = LinearLayout(context)
                         layout.id = R.id.quick_qs_footer_layout
@@ -737,6 +756,9 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         override fun afterHookedMethod(param: MethodHookParam) {
                             val qsPanel = param.thisObject as ViewGroup
                             val brightnessView = XposedHelpers.getObjectField(qsPanel, "mBrightnessView") as View
+
+                            (qsPanel.layoutParams as MarginLayoutParams).bottomMargin =
+                                    qsPanel.resUtils.getDimensionPixelSize(R.dimen.qs_footer_height)
 
                             brightnessView.setPadding(
                                     brightnessView.paddingLeft,

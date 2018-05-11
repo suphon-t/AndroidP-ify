@@ -30,4 +30,6 @@
     <dimen name="dashboard_tile_image_margin">18dp</dimen>
     <dimen name="qs_notif_collapsed_space">72dp</dimen>
     <dimen name="signal_indicator_to_icon_frame_spacing">3dp</dimen>
+    <dimen name="qs_footer_height">56dp</dimen>
+    <dimen name="settings_container_top_margin">4dp</dimen>
 </resources>
