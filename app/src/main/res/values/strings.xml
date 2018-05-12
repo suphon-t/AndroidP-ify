@@ -45,7 +45,7 @@
     <string name="please_install_pixel_navbar">Please install Pixel Navigation Bar from Google Play</string>
     <string name="use_google_sans">Google Sans</string>
     <string name="use_google_sans_summary">Use Google Sans font in various places in System UI</string>
-    <string name="proxy_overview_summary">This requires Pixel Launcher Q-4753642 to work\nVery experimental and may be removed in the future</string>
+    <string name="proxy_overview_summary">This requires Pixel Launcher Q-4753642 to work\nVery experimental, buggy and unsupported. Use at your own risk.</string>
     <string name="proxy_overview_category">Android P recent apps</string>
     <string name="enable_proxy_overview_title">Enable</string>
     <string name="proxy_package_title">Select launcher for recent apps</string>
