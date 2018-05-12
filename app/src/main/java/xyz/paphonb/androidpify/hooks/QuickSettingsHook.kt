@@ -82,6 +82,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     val qsNotifCollapsedSpace by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.qs_notif_collapsed_space) }
     val signalIndicatorToIconFrameSpacing by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.signal_indicator_to_icon_frame_spacing) }
 
+    var bgColor = Color.WHITE
+
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (lpparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
         if (!ConfigUtils.notifications.changePullDown) return
@@ -95,6 +97,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         val context = qsContainer.context
                         val ownResources = ResourceUtils.getInstance(context)
                         val qsElevation = ownResources.getDimensionPixelSize(R.dimen.qs_background_elevation).toFloat()
+
+                        bgColor = context.getColorAttr(android.R.attr.colorBackgroundFloating)
 
                         if (!MainHook.ATLEAST_O_MR1) {
                             qsContainer.removeViewAt(0)
@@ -644,7 +648,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     val state = param.args[1] as Int
 
                     if (state == 2) {
-                        param.result = Color.WHITE
+                        param.result = bgColor
                     }
                 }
             })
