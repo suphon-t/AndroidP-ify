@@ -40,5 +40,10 @@
             android:entries="@array/proxy_packages"
             android:entryValues="@array/proxy_package_values"
             android:defaultValue="com.google.android.apps.nexuslauncher" />
+
+        <xyz.paphonb.androidpify.ui.SecureSwitchPreference
+            android:key="swipe_up_to_switch_apps_enabled"
+            android:title="@string/swipe_up_to_switch_apps_title"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

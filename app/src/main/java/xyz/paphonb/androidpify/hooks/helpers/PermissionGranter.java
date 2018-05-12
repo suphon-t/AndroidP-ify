@@ -15,6 +15,7 @@
 
 package xyz.paphonb.androidpify.hooks.helpers;
 
+import android.Manifest;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -65,6 +66,10 @@ public class PermissionGranter {
                                 grantPerm(ps, permissions, ACCESS_INSTANT_APPS);
                                 grantPerm(ps, permissions, MANAGE_ACTIVITY_STACKS);
                                 grantPerm(ps, permissions, START_TASKS_FROM_RECENTS);
+                            }
+
+                            if (MainHook.PACKAGE_OWN.equals(pkgName)) {
+                                grantPerm(ps, permissions, Manifest.permission.WRITE_SECURE_SETTINGS);
                             }
                         }
                     });
