@@ -135,6 +135,15 @@ object LauncherHook : IXposedHookLoadPackage {
             }
         })
 
+        val recentsActivity = XposedHelpers.findClass("com.android.quickstep.RecentsActivity", lpparam.classLoader)
+        XposedHelpers.findAndHookMethod(recentsActivity, "getActivityLaunchOptions",
+                View::class.java, Boolean::class.java, object : XC_MethodHook() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
+                val view = param.args[0] as View
+                param.result = ActivityOptions.makeClipRevealAnimation(view, 0, 0, view.width, view.height)
+            }
+        })
+
         val recentsView = XposedHelpers.findClass("com.android.quickstep.views.RecentsView", lpparam.classLoader)
         XposedHelpers.findAndHookMethod(recentsView, "isRecentsEnabled", object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
