@@ -40,8 +40,8 @@
     <string name="swap_qs_and_brightness_title">Ползунок яркости снизу</string>
     <string name="use_new_transitions_title">Использовать новые переходы</string>
     <string name="use_new_transitions_summary">Для переключения приложений</string>
-    <string name="use_pixel_home_button_title">Кнопка домой Pixel</string>
-    <string name="use_pixel_home_button_summary">Включить анимацию кнопки домой в стиле Pixel</string>
+    <string name="use_pixel_home_button_title">Панель навигации Pixel</string>
+    <string name="use_pixel_home_button_summary">Включить панель навигации в стиле Pixel</string>
     <string name="please_install_pixel_navbar">Установите Pixel Navigation Bar из Google Play</string>
     <string name="use_google_sans">Google Sans</string>
     <string name="use_google_sans_summary">Использовать шрифт Google Sans в системе</string>
