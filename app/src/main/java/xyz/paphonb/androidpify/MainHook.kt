@@ -39,6 +39,7 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
         add(NotificationStackHook)
         add(QuickSettingsHook)
         add(RecentsHook)
+        add(RippleHook)
         add(SettingsHook)
         add(SystemUIHook)
         add(TransitionsHook)
