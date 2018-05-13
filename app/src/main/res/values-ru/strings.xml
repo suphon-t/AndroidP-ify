@@ -37,16 +37,17 @@
     <string name="qs_vertical_scroll_title">Вертикальная прокрутка</string>
     <string name="qs_vertical_scroll_summary">Заменить разделы быстрых настроек на вертикальную прокрутку (нестабильно)</string>
     <string name="status_bar_alarm">Будильник</string>
-    <string name="swap_qs_and_brightness_title">Ползунок яркости снизу</string>
+    <string name="swap_qs_and_brightness_title">Ползунок яркости сверху</string>
     <string name="use_new_transitions_title">Использовать новые переходы</string>
     <string name="use_new_transitions_summary">Для переключения приложений</string>
-    <string name="use_pixel_home_button_title">Кнопка домой Pixel</string>
-    <string name="use_pixel_home_button_summary">Включить анимацию кнопки домой в стиле Pixel</string>
+    <string name="use_pixel_home_button_title">Панель навигации Pixel</string>
+    <string name="use_pixel_home_button_summary">Включить панель навигации в стиле Pixel</string>
     <string name="please_install_pixel_navbar">Установите Pixel Navigation Bar из Google Play</string>
     <string name="use_google_sans">Google Sans</string>
     <string name="use_google_sans_summary">Использовать шрифт Google Sans в системе</string>
-    <string name="proxy_overview_summary">Для работы требуется Pixel Launcher Q-4753642 \n(Эксперементально и может быть удалено в будущем)</string>
+    <string name="proxy_overview_summary">Для работы требуется Pixel Launcher Q-4753642 \n Эксперементально, использовать на свой страх и риск</string>
     <string name="proxy_overview_category">Недавние приложения из Android P</string>
     <string name="enable_proxy_overview_title">Включить</string>
     <string name="proxy_package_title">Лончер для недавних приложений</string>
+	<string name="swipe_up_to_switch_apps_title">Свайп от панели избранного для переключения приложений</string>
 </resources> 
