@@ -78,6 +78,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classQSIconViewImpl by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSIconViewImpl", classLoader) }
     private val classQSTileView by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileView", classLoader) }
     private val classDrawableIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl\$DrawableIcon", classLoader) }
+    private val classResourceIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl\$ResourceIcon", classLoader) }
+    private val classRotationLockTile by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.RotationLockTile", classLoader) }
     private val classBluetoothTile by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.BluetoothTile", classLoader) }
     private val classBluetoothBatteryMeterDrawable by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.BluetoothTile\$BluetoothBatteryDrawable", classLoader) }
 
@@ -864,6 +866,23 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                             child.imageTintList = ColorStateList.valueOf(accentColor)
                         }
                     }
+                }
+            })
+
+            XposedBridge.hookAllMethods(classRotationLockTile, "handleUpdateState", object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val state = param.args[0]
+                    val context = param.thisObject.field<Context>("mContext")
+                    state.setField("icon", getIcon(context, param.thisObject))
+                }
+
+                fun getIcon(context: Context, tile: Any): Any? {
+                    var icon = tile.additionalField<Any?>("icon")
+                    if (icon == null) {
+                        icon = classResourceIcon.newInstance(context.resources.getIdentifier("ic_portrait_from_auto_rotate", "drawable", MainHook.PACKAGE_SYSTEMUI))
+                        tile.setAdditionalField("icon", icon)
+                    }
+                    return icon
                 }
             })
 
