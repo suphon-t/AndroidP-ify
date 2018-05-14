@@ -28,7 +28,7 @@
     <string name="about_title">Acerca de</string>
     <string name="about_pref_summary">Obtén más información sobre la app</string>
     <string name="about_share_title">Compartir</string>
-    <string name="about_author_title">Autoor</string>
+    <string name="about_author_title">Autor</string>
     <string name="about_author_name">paphonb</string>
     <string name="about_author_github">Accede a su Github</string>
     <string name="share_with">Comparte \"%s\" con</string>
