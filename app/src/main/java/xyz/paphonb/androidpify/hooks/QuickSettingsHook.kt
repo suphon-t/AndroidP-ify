@@ -873,13 +873,19 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                 override fun afterHookedMethod(param: MethodHookParam) {
                     val state = param.args[0]
                     val context = param.thisObject.field<Context>("mContext")
+                    val locked = state.field<Boolean>("value")
+                    if (!locked) {
+                        state.setField("label", context.getString(context.resources.getIdentifier(
+                                "quick_settings_rotation_unlocked_label", "string", MainHook.PACKAGE_SYSTEMUI)))
+                    }
                     state.setField("icon", getIcon(context, param.thisObject))
                 }
 
                 fun getIcon(context: Context, tile: Any): Any? {
                     var icon = tile.additionalField<Any?>("icon")
                     if (icon == null) {
-                        icon = classResourceIcon.newInstance(context.resources.getIdentifier("ic_portrait_from_auto_rotate", "drawable", MainHook.PACKAGE_SYSTEMUI))
+                        icon = classResourceIcon.newInstance(context.resources.getIdentifier(
+                                "ic_portrait_from_auto_rotate", "drawable", MainHook.PACKAGE_SYSTEMUI))
                         tile.setAdditionalField("icon", icon)
                     }
                     return icon
