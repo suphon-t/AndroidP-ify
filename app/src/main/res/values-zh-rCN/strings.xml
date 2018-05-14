@@ -35,7 +35,7 @@
 	<string name="circle_tile_background_title">启用圆形快速设置图块背景</string>
 	<string name="circle_tile_background_summary">在快速设置图块上显示圆形背景</string>
 	<string name="qs_vertical_scroll_title">快速设置纵向滚动</string>
-	<string name="qs_vertical_scroll_summary">用垂直滚动的网格取代分页的快速设置（可能会有非常多设置项）</string>
+	<string name="qs_vertical_scroll_summary">用垂直滚动的网格取代分页的快速设置（测试中）</string>
 	<string name="status_bar_alarm">闹钟</string>
 	<string name="swap_qs_and_brightness_title">交换快速设置和亮度设置条的位置</string>
 	<string name="use_new_transitions_title">使用新的转场动画</string>
@@ -45,9 +45,9 @@
 	<string name="please_install_pixel_navbar">请从Google Play安装Pixel Navigation Bar并启用</string>
 	<string name="use_google_sans">启用Google Sans字体</string>
 	<string name="use_google_sans_summary">在所有系统用户界面使用Google Sans字体</string>
-	<string name="proxy_overview_title">Android P 多任务样式</string>
-	<string name="proxy_overview_summary">需要Pixel Launcher Q-4753642版本才能运行\n（实验性功能，将来有可能会被删除）</string>
+	<string name="proxy_overview_summary">需要Pixel Launcher Q-4753642版本才能运行\n实验性功能，非常容易导致异常，开发者不提供支持，使用风险自负</string>
 	<string name="proxy_overview_category">Android P 多任务界面样式</string>
 	<string name="enable_proxy_overview_title">启用</string>
 	<string name="proxy_package_title">请选择多任务界面针对的启动器版本</string>
+	<string name="swipe_up_to_switch_apps_title">Dock栏上划切换最近应用</string>
 </resources>
