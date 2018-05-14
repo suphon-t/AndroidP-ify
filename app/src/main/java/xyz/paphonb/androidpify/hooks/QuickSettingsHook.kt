@@ -5,12 +5,11 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.XResources
-import android.graphics.Color
-import android.graphics.Point
-import android.graphics.Rect
-import android.graphics.Typeface
+import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.service.quicksettings.Tile
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.*
 import android.view.View.MeasureSpec
@@ -75,12 +74,22 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classSignalIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.CellTileView\$SignalIcon", classLoader) }
     private val classBatteryMeterView by lazy { XposedHelpers.findClass("com.android.systemui.BatteryMeterView", classLoader) }
     private val classPageIndicator by lazy { XposedHelpers.findClass("com.android.systemui.qs.PageIndicator", classLoader) }
+    private val classCellularTile by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.CellularTile", classLoader) }
+    private val classQSIconViewImpl by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSIconViewImpl", classLoader) }
+    private val classQSTileView by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileView", classLoader) }
+    private val classDrawableIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl\$DrawableIcon", classLoader) }
+    private val classResourceIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl\$ResourceIcon", classLoader) }
+    private val classRotationLockTile by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.RotationLockTile", classLoader) }
+    private val classBluetoothTile by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.BluetoothTile", classLoader) }
+    private val classBluetoothBatteryMeterDrawable by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.BluetoothTile\$BluetoothBatteryDrawable", classLoader) }
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
     val qsHeaderSystemIconsAreaHeight by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.qs_header_system_icons_area_height) }
     val qsNotifCollapsedSpace by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.qs_notif_collapsed_space) }
     val signalIndicatorToIconFrameSpacing by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.signal_indicator_to_icon_frame_spacing) }
+
+    var bgColor = Color.WHITE
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (lpparam.packageName != MainHook.PACKAGE_SYSTEMUI) return
@@ -95,6 +104,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         val context = qsContainer.context
                         val ownResources = ResourceUtils.getInstance(context)
                         val qsElevation = ownResources.getDimensionPixelSize(R.dimen.qs_background_elevation).toFloat()
+
+                        bgColor = context.getColorAttr(android.R.attr.colorBackgroundFloating)
 
                         if (!MainHook.ATLEAST_O_MR1) {
                             qsContainer.removeViewAt(0)
@@ -576,6 +587,96 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
             }
         })
 
+        XposedBridge.hookAllMethods(classCellularTile, "handleUpdateState", object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                val state = param.args[0]
+                val cb = param.args[1] ?: param.thisObject.objField("mSignalCallback").objField("mInfo")
+                val value = XposedHelpers.getBooleanField(state, "value")
+                val context = param.thisObject.field<Context>("mContext")
+                state.setIntField("state", if (value) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE)
+                if (cb.field("noSim")) {
+                    state.setField("state", Tile.STATE_UNAVAILABLE)
+                } else {
+                    state.setField("icon", getIcon(context, param.thisObject))
+                    if (cb.field("airplaneModeEnabled")) {
+                        state.setIntField("state", Tile.STATE_UNAVAILABLE)
+                        state.setAdditionalField("secondaryLabel", context.resources.getStringSystemUi("status_bar_airplane"))
+                    } else if (value) {
+                        state.setIntField("state", Tile.STATE_ACTIVE)
+                        state.setAdditionalField("secondaryLabel", getMobileDataDescription(context, cb, value))
+                    } else {
+                        state.setIntField("state", Tile.STATE_INACTIVE)
+                        state.setAdditionalField("secondaryLabel", context.resources.getStringSystemUi("switch_bar_off"))
+                    }
+                }
+            }
+
+            fun getMobileDataDescription(context: Context, cb: Any, enabled: Boolean): CharSequence? {
+                val dataContentDescription = cb.field<String>("dataContentDescription")
+                val roaming = cb.field<Boolean>("roaming")
+                val roamingString = context.resources.getStringSystemUi("accessibility_data_connection_roaming")
+                return if (roaming && !TextUtils.isEmpty(dataContentDescription)) {
+                    String.format("%s — %s", roamingString, dataContentDescription)
+                } else if (roaming) {
+                    roamingString
+                } else if (enabled) {
+                    dataContentDescription
+                } else {
+                    null
+                }
+            }
+
+            fun getIcon(context: Context, tile: Any): Any? {
+                var icon = tile.additionalField<Any?>("icon")
+                if (icon == null) {
+                    icon = classDrawableIcon.newInstance(context.resUtils.getDrawable(R.drawable.ic_swap_vert))
+                    tile.setAdditionalField("icon", icon)
+                }
+                return icon
+            }
+        })
+
+        XposedHelpers.findAndHookMethod(classCellularTile, "createTileView", Context::class.java, object : XC_MethodHook() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
+                val context = param.args[0]
+                param.result = XposedHelpers.newInstance(classQSIconViewImpl, context)
+            }
+        })
+
+        XposedHelpers.findAndHookMethod(classQSTileView, "createLabel", object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                val labelContainer = param.thisObject.field<ViewGroup>("mLabelContainer")
+                val context = labelContainer.context
+                val secondLine = labelContainer.findViewById<View>(context.resources.getIdSystemUi("app_label"))
+                secondLine.alpha = 0.6f
+                param.thisObject.setAdditionalField("secondLine", secondLine)
+                val label = param.thisObject.field<TextView>("mLabel")
+                label.setTypeface(Typeface.DEFAULT, Typeface.NORMAL)
+            }
+        })
+
+        XposedBridge.hookAllMethods(classQSTileView, "handleStateChanged", object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                val state = param.args[0]
+                val secondLine = param.thisObject.additionalField<TextView?>("secondLine")
+                if (secondLine != null) {
+                    val secondaryLabel = state.additionalField<String?>("secondaryLabel")
+                    if (secondaryLabel != secondLine.text) {
+                        secondLine.text = secondaryLabel
+                        secondLine.visibility = if (TextUtils.isEmpty(secondaryLabel)) View.GONE else View.VISIBLE
+                    }
+                }
+            }
+        })
+
+        XposedHelpers.findAndHookMethod(classQSTileState, "copyTo", classQSTileState, object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                val oldState = param.thisObject
+                val newState = param.args[0]
+                newState.setAdditionalField("secondaryLabel", oldState.additionalField("secondaryLabel"))
+            }
+        })
+
         try {
             findAndHookMethod(classQuickStatusBarHeader, "onTuningChanged",
                     String::class.java, String::class.java, XC_MethodReplacement.DO_NOTHING)
@@ -644,7 +745,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                     val state = param.args[1] as Int
 
                     if (state == 2) {
-                        param.result = Color.WHITE
+                        param.result = bgColor
                     }
                 }
             })
@@ -764,6 +865,42 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         if (child is ImageView) {
                             child.imageTintList = ColorStateList.valueOf(accentColor)
                         }
+                    }
+                }
+            })
+
+            XposedBridge.hookAllMethods(classRotationLockTile, "handleUpdateState", object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val state = param.args[0]
+                    val context = param.thisObject.field<Context>("mContext")
+                    state.setField("icon", getIcon(context, param.thisObject))
+                }
+
+                fun getIcon(context: Context, tile: Any): Any? {
+                    var icon = tile.additionalField<Any?>("icon")
+                    if (icon == null) {
+                        icon = classResourceIcon.newInstance(context.resources.getIdentifier("ic_portrait_from_auto_rotate", "drawable", MainHook.PACKAGE_SYSTEMUI))
+                        tile.setAdditionalField("icon", icon)
+                    }
+                    return icon
+                }
+            })
+
+            XposedBridge.hookAllMethods(classBluetoothTile, "handleUpdateState", object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val state = param.args[0]
+                    state.objField("icon")?.setAdditionalField("tint", true)
+                }
+            })
+
+            findAndHookMethod(classBluetoothBatteryMeterDrawable, "getDrawable",
+                    Context::class.java, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    if (param.thisObject.additionalField<Any?>("tint") != null) {
+                        val drawable = param.result as Drawable
+                        val context = param.args[0] as Context
+                        val tintColor = context.getColorAttr(android.R.attr.colorBackgroundFloating)
+                        drawable.colorFilter = PorterDuffColorFilter(tintColor, PorterDuff.Mode.SRC_IN)
                     }
                 }
             })

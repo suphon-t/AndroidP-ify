@@ -25,6 +25,7 @@ import android.support.annotation.ColorInt
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import de.robv.android.xposed.XposedHelpers
 import xyz.paphonb.androidpify.MainHook
 
 
@@ -101,6 +102,7 @@ fun TextView.setGoogleSans(style: String = "Regular"): Boolean {
 }
 
 val View.resUtils get() = ResourceUtils.getInstance(context)!!
+val Context.resUtils get() = ResourceUtils.getInstance(this)!!
 
 inline fun ViewGroup.forEachChild(body: (View) -> Unit) {
     for (i in (0 until childCount)) body(getChildAt(i))
@@ -120,6 +122,8 @@ fun Resources.getLayoutSystemUi(name: String) = getIdentifier(name, "layout", Ma
 
 fun Resources.getDimenSystemUi(name: String) = getDimensionPixelSize(getIdentifier(name, "dimen", MainHook.PACKAGE_SYSTEMUI))
 
+fun Resources.getStringSystemUi(name: String) = getString(getIdentifier(name, "string", MainHook.PACKAGE_SYSTEMUI))
+
 inline fun logThrowable(tag: String, message: String, body: () -> Unit) {
     try {
         body()
@@ -128,3 +132,36 @@ inline fun logThrowable(tag: String, message: String, body: () -> Unit) {
         throw t
     }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Any.objField(name: String) = XposedHelpers.getObjectField(this, name)
+
+@Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+inline fun <T>Any.field(name: String) = XposedHelpers.getObjectField(this, name) as T
+
+@Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+inline fun <T>Any.additionalField(name: String) = XposedHelpers.getAdditionalInstanceField(this, name) as T
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Any.setField(name: String, value: Any?) {
+    XposedHelpers.setObjectField(this, name, value)
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Any.setAdditionalField(name: String, value: Any?) {
+    XposedHelpers.setAdditionalInstanceField(this, name, value)
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Any.setIntField(name: String, value: Int) {
+    XposedHelpers.setObjectField(this, name, value)
+}
+
+@Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+inline fun <T>Any.callMethod(name: String, vararg args: Any?) = XposedHelpers.callMethod(this, name, *args) as T
+
+@Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+inline fun <T>Class<*>.callStaticMethod(name: String, vararg args: Any?) = XposedHelpers.callStaticMethod(this, name, *args) as T
+
+@Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+inline fun <T>Class<*>.newInstance(vararg args: Any?) = XposedHelpers.newInstance(this, *args) as T

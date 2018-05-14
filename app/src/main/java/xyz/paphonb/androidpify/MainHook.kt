@@ -31,6 +31,19 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
 
     private var MODULE_PATH = ""
     private lateinit var modResInternal: XModuleResources
+    private val hooks = ArrayList<Any>().apply {
+        add(CustomizationsHook)
+        add(KeyguardHook)
+        add(LauncherHook)
+        add(LeftClockHook)
+        add(NotificationStackHook)
+        add(QuickSettingsHook)
+        add(RecentsHook)
+        add(RippleHook)
+        add(SettingsHook)
+        add(SystemUIHook)
+        add(TransitionsHook)
+    }
 
     val modRes get() = modResInternal
 
@@ -40,15 +53,7 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
     }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
-        SystemUIHook.handleLoadPackage(lpparam)
-        TransitionsHook.handleLoadPackage(lpparam)
-        LeftClockHook.handleLoadPackage(lpparam)
-        CustomizationsHook.handleLoadPackage(lpparam)
-        NotificationStackHook.handleLoadPackage(lpparam)
-        QuickSettingsHook.handleLoadPackage(lpparam)
-        SettingsHook.handleLoadPackage(lpparam)
-        RecentsHook.handleLoadPackage(lpparam)
-        LauncherHook.handleLoadPackage(lpparam)
+        hooks.forEach { (it as? IXposedHookLoadPackage)?.handleLoadPackage(lpparam) }
 
         if (lpparam.packageName == PACKAGE_OWN) {
             XposedHelpers.findAndHookMethod(SETTINGS_OWN, lpparam.classLoader,
@@ -63,10 +68,8 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
 
     override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
         modResInternal = XModuleResources.createInstance(MODULE_PATH, resparam.res)
-        NotificationStackHook.handleInitPackageResources(resparam)
-        QuickSettingsHook.handleInitPackageResources(resparam)
-        SettingsHook.handleInitPackageResources(resparam)
-        KeyguardHook.handleInitPackageResources(resparam)
+
+        hooks.forEach { (it as? IXposedHookInitPackageResources)?.handleInitPackageResources(resparam) }
     }
 
     val ATLEAST_O_MR1 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1
