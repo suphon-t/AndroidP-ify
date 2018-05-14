@@ -45,7 +45,7 @@
 	<string name="please_install_pixel_navbar">请从Google Play安装Pixel Navigation Bar并启用</string>
 	<string name="use_google_sans">启用Google Sans字体</string>
 	<string name="use_google_sans_summary">在所有系统用户界面使用Google Sans字体</string>
-	<string name="proxy_overview_summary">需要Pixel Launcher Q-4753642版本才能运行\n实验性功能，非常容易导致异常或者不支持，使用风险自负</string>
+	<string name="proxy_overview_summary">需要Pixel Launcher Q-4753642版本才能运行\n实验性功能，非常容易导致异常，开发者不提供支持，使用风险自负</string>
 	<string name="proxy_overview_category">Android P 多任务界面样式</string>
 	<string name="enable_proxy_overview_title">启用</string>
 	<string name="proxy_package_title">请选择多任务界面针对的启动器版本</string>
