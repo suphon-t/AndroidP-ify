@@ -5,10 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.XResources
-import android.graphics.Color
-import android.graphics.Point
-import android.graphics.Rect
-import android.graphics.Typeface
+import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.service.quicksettings.Tile
@@ -81,6 +78,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classQSIconViewImpl by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSIconViewImpl", classLoader) }
     private val classQSTileView by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileView", classLoader) }
     private val classDrawableIcon by lazy { XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl\$DrawableIcon", classLoader) }
+    private val classBluetoothTile by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.BluetoothTile", classLoader) }
+    private val classBluetoothBatteryMeterDrawable by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.BluetoothTile\$BluetoothBatteryDrawable", classLoader) }
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
@@ -864,6 +863,25 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         if (child is ImageView) {
                             child.imageTintList = ColorStateList.valueOf(accentColor)
                         }
+                    }
+                }
+            })
+
+            XposedBridge.hookAllMethods(classBluetoothTile, "handleUpdateState", object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val state = param.args[0]
+                    state.objField("icon")?.setAdditionalField("tint", true)
+                }
+            })
+
+            findAndHookMethod(classBluetoothBatteryMeterDrawable, "getDrawable",
+                    Context::class.java, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    if (param.thisObject.additionalField<Any?>("tint") != null) {
+                        val drawable = param.result as Drawable
+                        val context = param.args[0] as Context
+                        val tintColor = context.getColorAttr(android.R.attr.colorBackgroundFloating)
+                        drawable.colorFilter = PorterDuffColorFilter(tintColor, PorterDuff.Mode.SRC_IN)
                     }
                 }
             })
