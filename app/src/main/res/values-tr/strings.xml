@@ -43,4 +43,11 @@
     <string name="use_pixel_home_button_title">Pixel Tarzı Ana Sayfa Tuşu</string>
     <string name="use_pixel_home_button_summary">Pixel Stili Animasyonlu Ana Sayfa Tuşunu Kullan</string>
     <string name="please_install_pixel_navbar">Lütfen Google Play'den Pixel Navigation Bar'ı yükleyin</string>
+    <string name="use_google_sans">Google Sans</string>
+    <string name="use_google_sans_summary">Bildirim Çubuğunda Google Yazı Fontunu Kullan</string>
+    <string name="proxy_overview_summary">Bu Deneysel Ve Desteksiz Olan Bir Ana Ekran Uygulamasıdır. Q-4753642 Kullanımı Sizin Sorumluluğunuzdadır</string>
+    <string name="proxy_overview_category">Android P Son Uygulamalar</string>
+    <string name="enable_proxy_overview_title">Etkin</string>
+    <string name="proxy_package_title">Son Uygulamalar İçin Ana Ekran Uygulaması Seçiniz</string>
+    <string name="swipe_up_to_switch_apps_title">Uygulamalar Arası Geçiş Yapmak İçin Yukarıya Doğru Kaydırınız</string>
 </resources>
