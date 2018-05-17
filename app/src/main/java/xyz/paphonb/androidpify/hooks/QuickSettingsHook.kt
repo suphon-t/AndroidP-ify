@@ -82,6 +82,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
     private val classRotationLockTile by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.RotationLockTile", classLoader) }
     private val classBluetoothTile by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.BluetoothTile", classLoader) }
     private val classBluetoothBatteryMeterDrawable by lazy { XposedHelpers.findClass("com.android.systemui.qs.tiles.BluetoothTile\$BluetoothBatteryDrawable", classLoader) }
+    private val classToggleSliderView by lazy { XposedHelpers.findClass("com.android.systemui.settings.ToggleSliderView", classLoader) }
 
     val mSidePaddings by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_side_paddings) }
     val mCornerRadius by lazy { MainHook.modRes.getDimensionPixelSize(R.dimen.notification_corner_radius) }
@@ -1087,6 +1088,17 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                         }
                     }
                 })
+
+        findAndHookConstructor(classToggleSliderView,
+                Context::class.java, AttributeSet::class.java, Int::class.java, object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                val slider = param.thisObject.field<SeekBar>("mSlider")
+                val resUtils = slider.resUtils
+                val theme = slider.context.theme
+                slider.thumb = resUtils.getDrawable(R.drawable.ic_brightness_thumb, theme)
+                slider.progressDrawable = resUtils.getDrawable(R.drawable.brightness_progress_drawable, theme)
+            }
+        })
     }
 
     fun qsPanelUpdateResources(qsPanel: ViewGroup) {
