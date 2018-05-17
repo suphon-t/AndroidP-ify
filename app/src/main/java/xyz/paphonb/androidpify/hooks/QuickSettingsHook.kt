@@ -19,6 +19,7 @@ import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.findAndHookConstructor
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
+import de.robv.android.xposed.callbacks.XC_LayoutInflated
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import xyz.paphonb.androidpify.MainHook
 import xyz.paphonb.androidpify.R
@@ -1175,6 +1176,20 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
         r_qs_scroll_layout = XResources.getFakeResId(MainHook.modRes, R.id.qs_scroll_layout)
         r_quick_qs_tooltip = XResources.getFakeResId(MainHook.modRes, R.id.quick_qs_tooltip)
         r_mobile_signal_group = XResources.getFakeResId(MainHook.modRes, R.id.mobile_signal_group)
+
+        resparam.res.hookLayout(MainHook.PACKAGE_SYSTEMUI, "layout", "brightness_mirror", object : XC_LayoutInflated() {
+            override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
+                val container = liparam.view as ViewGroup
+                val frame = container.getChildAt(0) as View
+                frame.background = frame.resUtils.getDrawable(R.drawable.brightness_mirror_background, frame.context.theme)
+                (frame.layoutParams as? MarginLayoutParams)?.run {
+                    leftMargin = mSidePaddings
+                    topMargin = mSidePaddings
+                    rightMargin = mSidePaddings
+                    bottomMargin = mSidePaddings
+                }
+            }
+        })
 
         if (MainHook.ATLEAST_O_MR1) {
             resparam.res.setReplacement(MainHook.PACKAGE_SYSTEMUI, "dimen", "qs_header_system_icons_area_height",
