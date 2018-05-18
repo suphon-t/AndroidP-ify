@@ -599,7 +599,7 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                 if (cb.field("noSim")) {
                     state.setField("state", Tile.STATE_UNAVAILABLE)
                 } else {
-                    state.setField("icon", getIcon(context, param.thisObject))
+                    state.setField("icon", getIcon(context))
                     if (cb.field("airplaneModeEnabled")) {
                         state.setIntField("state", Tile.STATE_UNAVAILABLE)
                         state.setAdditionalField("secondaryLabel", context.resources.getStringSystemUi("status_bar_airplane"))
@@ -628,13 +628,8 @@ object QuickSettingsHook : IXposedHookLoadPackage, IXposedHookInitPackageResourc
                 }
             }
 
-            fun getIcon(context: Context, tile: Any): Any? {
-                var icon = tile.additionalField<Any?>("icon")
-                if (icon == null) {
-                    icon = classDrawableIcon.newInstance(context.resUtils.getDrawable(R.drawable.ic_swap_vert))
-                    tile.setAdditionalField("icon", icon)
-                }
-                return icon
+            fun getIcon(context: Context): Any? {
+                return classDrawableIcon.newInstance(context.resUtils.getDrawable(R.drawable.ic_swap_vert))
             }
         })
 
