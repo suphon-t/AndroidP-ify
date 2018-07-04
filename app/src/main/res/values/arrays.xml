@@ -2,11 +2,11 @@
 <resources>
     <string-array name="proxy_packages">
         <item>MPL Q-4753642</item>
-        <item>MPL Q-4753642 for Pixel</item>
+        <item>Pixel Launcher 9-480635</item>
     </string-array>
 
     <string-array name="proxy_package_values">
-        <item>com.google.android.apps.nexuslauncher</item>
-        <item>com.google.android.apps.moddednexuslauncher</item>
+        <item>mpl6</item>
+        <item>mpl8</item>
     </string-array>
 </resources>

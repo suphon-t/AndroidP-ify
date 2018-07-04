@@ -165,7 +165,7 @@ public class OverviewProxyService implements CallbackController<OverviewProxySer
     }
 
     private ComponentName getRecentsComponent() {
-        return new ComponentName(MainHook.INSTANCE.getPACKAGE_LAUNCHER(), "com.android.quickstep.RecentsActivity");
+        return new ComponentName(MainHook.PACKAGE_LAUNCHER, "com.android.quickstep.RecentsActivity");
     }
 
     public void startConnectionToCurrentUser() {

@@ -57,7 +57,7 @@ public class PermissionGranter {
                             final Object permissions = XposedHelpers.getObjectField(settings, "mPermissions");
 
                             // Launcher
-                            if (MainHook.INSTANCE.getPACKAGE_LAUNCHER().equals(pkgName)) {
+                            if (MainHook.PACKAGE_LAUNCHER.equals(pkgName)) {
                                 grantPerm(ps, permissions, GET_TASKS);
                                 grantPerm(ps, permissions, REMOVE_TASKS);
                                 grantPerm(ps, permissions, REAL_GET_TASKS);

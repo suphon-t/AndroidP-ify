@@ -22,8 +22,6 @@ import xyz.paphonb.androidpify.MainHook
 import xyz.paphonb.androidpify.utils.ConfigUtils
 import java.util.*
 
-
-
 object LauncherHook : IXposedHookLoadPackage {
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
@@ -42,16 +40,18 @@ object LauncherHook : IXposedHookLoadPackage {
                     }
                 })
 
-        val recentsTaskLoader = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoader", lpparam.classLoader)
-        val recentsTaskLoadPlan = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoadPlan", lpparam.classLoader)
-        val preloadOptions = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoadPlan\$PreloadOptions", lpparam.classLoader)
-        XposedHelpers.findAndHookMethod(recentsTaskLoadPlan, "preloadPlan", preloadOptions, recentsTaskLoader, Int::class.java, Int::class.java,
-                object : XC_MethodHook() {
-                    override fun beforeHookedMethod(param: MethodHookParam) {
-                        preloadPlan(param.thisObject, param.args[0], param.args[1], param.args[2] as Int, param.args[3] as Int)
-                        param.result = null
-                    }
-                })
+        if (ConfigUtils.misc.proxyOverviewPackage != "mpl7") {
+            val recentsTaskLoader = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoader", lpparam.classLoader)
+            val recentsTaskLoadPlan = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoadPlan", lpparam.classLoader)
+            val preloadOptions = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoadPlan\$PreloadOptions", lpparam.classLoader)
+            XposedHelpers.findAndHookMethod(recentsTaskLoadPlan, "preloadPlan", preloadOptions, recentsTaskLoader, Int::class.java, Int::class.java,
+                    object : XC_MethodHook() {
+                        override fun beforeHookedMethod(param: MethodHookParam) {
+                            preloadPlan(param.thisObject, param.args[0], param.args[1], param.args[2] as Int, param.args[3] as Int)
+                            param.result = null
+                        }
+                    })
+        }
 
         val TaskSnapshot = XposedHelpers.findClass("android.app.ActivityManager\$TaskSnapshot", lpparam.classLoader)
         val thumbnailData = XposedHelpers.findClass("com.android.systemui.shared.recents.model.ThumbnailData", lpparam.classLoader)
