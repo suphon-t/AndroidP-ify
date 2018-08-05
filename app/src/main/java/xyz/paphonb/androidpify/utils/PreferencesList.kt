@@ -31,7 +31,7 @@ object PreferencesList {
             put(newTransitions, LEVEL_ANDROID)
             put(googleSans, LEVEL_SYSTEM_UI)
             put(proxyOverview, LEVEL_ANDROID)
-            put(proxyOverviewPackage, LEVEL_ANDROID)
+            put(proxyOverviewPackage, LEVEL_SYSTEM_UI)
         }
     }
 
