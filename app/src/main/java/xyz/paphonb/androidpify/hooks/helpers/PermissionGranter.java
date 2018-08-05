@@ -20,6 +20,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import xyz.paphonb.androidpify.MainHook;
+import xyz.paphonb.androidpify.hooks.LauncherHook;
 
 public class PermissionGranter {
     public static final String TAG = "GB:PermissionGranter";
@@ -36,6 +37,10 @@ public class PermissionGranter {
     private static final String ACCESS_INSTANT_APPS = "android.permission.ACCESS_INSTANT_APPS";
     private static final String MANAGE_ACTIVITY_STACKS = "android.permission.MANAGE_ACTIVITY_STACKS";
     private static final String START_TASKS_FROM_RECENTS = "android.permission.START_TASKS_FROM_RECENTS";
+    private static final String INTERACT_ACROSS_USERS = "android.permission.INTERACT_ACROSS_USERS";
+    private static final String CREATE_USERS = "android.permission.CREATE_USERS";
+    private static final String MANAGE_USERS = "android.permission.MANAGE_USERS";
+    private static final String WRITE_SETTINGS = "android.permission.WRITE_SETTINGS";
 
     private static void log(String message) {
         XposedBridge.log(TAG + ": " + message);
@@ -57,7 +62,7 @@ public class PermissionGranter {
                             final Object permissions = XposedHelpers.getObjectField(settings, "mPermissions");
 
                             // Launcher
-                            if (MainHook.PACKAGE_LAUNCHER.equals(pkgName)) {
+                            if (LauncherHook.INSTANCE.getLauncherPackages().contains(pkgName)) {
                                 grantPerm(ps, permissions, GET_TASKS);
                                 grantPerm(ps, permissions, REMOVE_TASKS);
                                 grantPerm(ps, permissions, REAL_GET_TASKS);
@@ -66,6 +71,11 @@ public class PermissionGranter {
                                 grantPerm(ps, permissions, ACCESS_INSTANT_APPS);
                                 grantPerm(ps, permissions, MANAGE_ACTIVITY_STACKS);
                                 grantPerm(ps, permissions, START_TASKS_FROM_RECENTS);
+                                grantPerm(ps, permissions, INTERACT_ACROSS_USERS);
+                                grantPerm(ps, permissions, CREATE_USERS);
+                                grantPerm(ps, permissions, MANAGE_USERS);
+                                grantPerm(ps, permissions, WRITE_SETTINGS);
+                                grantPerm(ps, permissions, Manifest.permission.WRITE_SECURE_SETTINGS);
                             }
 
                             if (MainHook.PACKAGE_OWN.equals(pkgName)) {

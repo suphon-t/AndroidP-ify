@@ -21,11 +21,18 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 import xyz.paphonb.androidpify.MainHook
 import xyz.paphonb.androidpify.utils.ConfigUtils
 import java.util.*
+import kotlin.collections.HashSet
 
 object LauncherHook : IXposedHookLoadPackage {
 
+    val launcherPackages = HashSet<String>().apply {
+        add(MainHook.PACKAGE_LAUNCHER)
+        add(MainHook.PACKAGE_OP_LAUNCHER)
+    }
+    private val usingOldLauncher3 by lazy { ConfigUtils.misc.proxyOverviewPackage == "mpl6" }
+
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
-        if (lpparam.packageName != MainHook.PACKAGE_LAUNCHER) return
+        if (!launcherPackages.contains(lpparam.packageName)) return
         if (!ConfigUtils.misc.proxyOverview) return
 
         val activityManagerWrapper = XposedHelpers.findClass("com.android.systemui.shared.system.ActivityManagerWrapper", lpparam.classLoader)
@@ -40,7 +47,7 @@ object LauncherHook : IXposedHookLoadPackage {
                     }
                 })
 
-        if (ConfigUtils.misc.proxyOverviewPackage != "mpl7") {
+        if (usingOldLauncher3) {
             val recentsTaskLoader = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoader", lpparam.classLoader)
             val recentsTaskLoadPlan = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoadPlan", lpparam.classLoader)
             val preloadOptions = XposedHelpers.findClass("com.android.systemui.shared.recents.model.RecentsTaskLoadPlan\$PreloadOptions", lpparam.classLoader)

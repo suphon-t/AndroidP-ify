@@ -11,6 +11,7 @@ import com.android.systemui.shared.recents.ISystemUiProxy;
 import com.android.systemui.shared.system.GraphicBufferCompat;
 import de.robv.android.xposed.XposedHelpers;
 import xyz.paphonb.androidpify.MainHook;
+import xyz.paphonb.androidpify.utils.ConfigUtils;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -165,7 +166,11 @@ public class OverviewProxyService implements CallbackController<OverviewProxySer
     }
 
     private ComponentName getRecentsComponent() {
-        return new ComponentName(MainHook.PACKAGE_LAUNCHER, "com.android.quickstep.RecentsActivity");
+        if ("opl".equals(ConfigUtils.INSTANCE.getMisc().getProxyOverviewPackage())) {
+            return new ComponentName(MainHook.PACKAGE_OP_LAUNCHER, "net.oneplus.quickstep.RecentsActivity");
+        } else {
+            return new ComponentName(MainHook.PACKAGE_LAUNCHER, "com.android.quickstep.RecentsActivity");
+        }
     }
 
     public void startConnectionToCurrentUser() {
