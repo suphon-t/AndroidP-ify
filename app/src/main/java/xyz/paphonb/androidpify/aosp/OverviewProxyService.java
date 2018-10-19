@@ -166,7 +166,10 @@ public class OverviewProxyService implements CallbackController<OverviewProxySer
     }
 
     private ComponentName getRecentsComponent() {
-        if ("opl".equals(ConfigUtils.INSTANCE.getMisc().getProxyOverviewPackage())) {
+        String proxyPackage = ConfigUtils.INSTANCE.getMisc().getProxyOverviewPackage();
+        if ("lcci".equals(proxyPackage)) {
+            return new ComponentName(MainHook.PACKAGE_LAWNCHAIR, "com.android.quickstep.RecentsActivity");
+        } else if ("opl".equals(proxyPackage)) {
             return new ComponentName(MainHook.PACKAGE_OP_LAUNCHER, "net.oneplus.quickstep.RecentsActivity");
         } else {
             return new ComponentName(MainHook.PACKAGE_LAUNCHER, "com.android.quickstep.RecentsActivity");

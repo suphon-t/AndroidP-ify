@@ -79,6 +79,7 @@ object MainHook : IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInit
     const val PACKAGE_SETTINGS = "com.android.settings"
     const val PACKAGE_LAUNCHER = "com.google.android.apps.nexuslauncher"
     const val PACKAGE_OP_LAUNCHER = "net.oneplus.launcher"
+    const val PACKAGE_LAWNCHAIR = "ch.deletescape.lawnchair.ci"
 
     const val PACKAGE_OWN = "xyz.paphonb.androidpify"
     private val SETTINGS_OWN = SettingsActivity.BaseFragment::class.java.name
