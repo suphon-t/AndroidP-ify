@@ -28,6 +28,7 @@ object LauncherHook : IXposedHookLoadPackage {
     val launcherPackages = HashSet<String>().apply {
         add(MainHook.PACKAGE_LAUNCHER)
         add(MainHook.PACKAGE_OP_LAUNCHER)
+        add(MainHook.PACKAGE_LAWNCHAIR)
     }
     private val usingOldLauncher3 by lazy { ConfigUtils.misc.proxyOverviewPackage == "mpl6" }
 

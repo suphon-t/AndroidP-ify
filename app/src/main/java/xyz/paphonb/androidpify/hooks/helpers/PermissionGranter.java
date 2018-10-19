@@ -41,6 +41,8 @@ public class PermissionGranter {
     private static final String CREATE_USERS = "android.permission.CREATE_USERS";
     private static final String MANAGE_USERS = "android.permission.MANAGE_USERS";
     private static final String WRITE_SETTINGS = "android.permission.WRITE_SETTINGS";
+    private static final String FORCE_STOP_PACKAGES = "android.permission.FORCE_STOP_PACKAGES";
+    private static final String MANAGE_DEVICE_ADMINS = "android.permission.MANAGE_DEVICE_ADMINS";
 
     private static void log(String message) {
         XposedBridge.log(TAG + ": " + message);
@@ -75,6 +77,8 @@ public class PermissionGranter {
                                 grantPerm(ps, permissions, CREATE_USERS);
                                 grantPerm(ps, permissions, MANAGE_USERS);
                                 grantPerm(ps, permissions, WRITE_SETTINGS);
+                                grantPerm(ps, permissions, FORCE_STOP_PACKAGES);
+                                grantPerm(ps, permissions, MANAGE_DEVICE_ADMINS);
                                 grantPerm(ps, permissions, Manifest.permission.WRITE_SECURE_SETTINGS);
                             }
 

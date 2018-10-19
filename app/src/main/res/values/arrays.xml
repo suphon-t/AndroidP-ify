@@ -4,11 +4,13 @@
         <item>MPL Q-4753642</item>
         <item>Pixel Launcher 9-480635</item>
         <item>OnePlus Launcher 3.0.0.180712185010.70d321d</item>
+        <item>Lawnchair v2 ci alpha 551+</item>
     </string-array>
 
     <string-array name="proxy_package_values">
         <item>mpl6</item>
         <item>mpl8</item>
         <item>opl</item>
+        <item>lcci</item>
     </string-array>
 </resources>
